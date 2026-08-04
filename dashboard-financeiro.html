@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1630">
+<title>Dashboard Financeiro · Consultório</title>
+<style>
+/* ============================================================
+   TROQUE AS CORES AQUI
+   ============================================================ */
+:root{
+  --azul-fundo:      #071023;  /* fundo geral da página            */
+  --azul-painel:     #0d1b38;  /* cartões e caixas                 */
+  --azul-painel-2:   #122349;  /* caixas internas / listas         */
+  --azul-borda:      #1e3466;  /* linhas e bordas                  */
+  --azul-campo:      #08142c;  /* fundo dos campos de digitação    */
+  --dourado:         #d9b25f;  /* cor de destaque principal        */
+  --dourado-claro:   #f0d493;  /* destaque hover / títulos         */
+  --dourado-fraco:   #6b551f;  /* bordas douradas discretas        */
+  --texto:           #eef2fb;  /* texto principal                  */
+  --texto-fraco:     #93a3c4;  /* legendas e rótulos               */
+  --verde:           #34c98a;  /* entradas / positivo              */
+  --vermelho:        #ff6b6b;  /* saídas / vencido                 */
+  --azul-info:       #5aa9ff;  /* informações neutras              */
+  --raio:            16px;     /* arredondamento dos cantos        */
+  --raio-p:          10px;     /* arredondamento pequeno           */
+  --sombra: 0 10px 30px rgba(0,0,0,.35);
+  --fonte: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+/* ============================================================ */
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--azul-fundo);color:var(--texto);font-family:var(--fonte)}
+body{
+  padding:0 0 90px;
+  background-image:radial-gradient(1100px 500px at 15% -10%, #12264f 0%, transparent 60%),
+                   radial-gradient(900px 460px at 100% 0%, #16204a 0%, transparent 55%);
+  background-attachment:fixed;
+  font-size:15px;line-height:1.45;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 14px}
+
+/* ---------- topo ---------- */
+header{
+  position:sticky;top:0;z-index:40;
+  background:rgba(7,16,35,.92);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--azul-borda);
+}
+.topo{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 0}
+.marca{display:flex;align-items:center;gap:10px;margin-right:auto}
+.logo{
+  width:38px;height:38px;border-radius:12px;flex:0 0 auto;letter-spacing:-.5px;
+  background:linear-gradient(145deg,var(--dourado),#8a6c25);
+  display:flex;align-items:center;justify-content:center;
+  color:#12203f;font-weight:800;font-size:15px;
+}
+.marca h1{font-size:16px;font-weight:700;letter-spacing:.2px;line-height:1.15}
+.marca span{font-size:11.5px;color:var(--texto-fraco);font-weight:500}
+
+.mesnav{display:flex;align-items:center;gap:6px;background:var(--azul-painel);
+  border:1px solid var(--azul-borda);border-radius:999px;padding:4px 6px}
+.mesnav button{
+  width:32px;height:32px;border-radius:50%;border:0;cursor:pointer;
+  background:transparent;color:var(--dourado);font-size:18px;line-height:1;
+}
+.mesnav button:hover{background:var(--azul-painel-2)}
+.mesnav .rot{min-width:150px;text-align:center;font-weight:700;font-size:13.5px}
+
+.acoes{display:flex;gap:7px;flex-wrap:wrap}
+
+/* ---------- botões ---------- */
+button,.btn{font-family:var(--fonte)}
+.btn{
+  border:1px solid var(--azul-borda);background:var(--azul-painel);color:var(--texto);
+  padding:9px 13px;border-radius:var(--raio-p);cursor:pointer;font-size:13px;font-weight:600;
+  display:inline-flex;align-items:center;gap:6px;transition:.15s;
+}
+.btn:hover{border-color:var(--dourado-fraco);background:var(--azul-painel-2)}
+.btn.ouro{background:linear-gradient(145deg,var(--dourado),#b08f3d);color:#141f38;border-color:transparent}
+.btn.ouro:hover{filter:brightness(1.08)}
+.btn.verde{background:rgba(52,201,138,.14);border-color:rgba(52,201,138,.45);color:var(--verde)}
+.btn.perigo{background:rgba(255,107,107,.12);border-color:rgba(255,107,107,.4);color:var(--vermelho)}
+.btn.armado{background:var(--vermelho)!important;color:#fff!important;border-color:var(--vermelho)!important}
+.btn.pequeno{padding:6px 10px;font-size:12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* ---------- aviso mês ---------- */
+.aviso{
+  display:none;align-items:center;gap:10px;flex-wrap:wrap;
+  margin:12px 0 0;padding:11px 14px;border-radius:var(--raio-p);
+  background:rgba(217,178,95,.1);border:1px solid var(--dourado-fraco);color:var(--dourado-claro);
+  font-size:13.5px;font-weight:600;
+}
+.aviso.on{display:flex}
+
+/* ---------- cartões ---------- */
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-top:14px}
+.card{
+  background:var(--azul-painel);border:1px solid var(--azul-borda);
+  border-radius:var(--raio);padding:13px 14px;box-shadow:var(--sombra);position:relative;overflow:hidden;
+}
+.card::after{content:"";position:absolute;inset:0 0 auto 0;height:2px;background:var(--azul-borda)}
+.card.k-caixa::after{background:linear-gradient(90deg,var(--dourado),transparent)}
+.card.k-ent::after{background:linear-gradient(90deg,var(--verde),transparent)}
+.card.k-sai::after{background:linear-gradient(90deg,var(--vermelho),transparent)}
+.card.k-luc::after{background:linear-gradient(90deg,var(--azul-info),transparent)}
+.card h3{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--texto-fraco)}
+.card .v{font-size:21px;font-weight:800;margin-top:5px;letter-spacing:-.4px;word-break:break-word}
+.card .s{font-size:11.5px;color:var(--texto-fraco);margin-top:3px}
+.v.pos{color:var(--verde)} .v.neg{color:var(--vermelho)} .v.ouro{color:var(--dourado)}
+
+/* ---------- abas ---------- */
+.abas{display:flex;gap:6px;overflow-x:auto;margin:18px 0 14px;padding-bottom:4px;scrollbar-width:none}
+.abas::-webkit-scrollbar{display:none}
+.aba{
+  white-space:nowrap;border:1px solid var(--azul-borda);background:var(--azul-painel);
+  color:var(--texto-fraco);padding:9px 15px;border-radius:999px;cursor:pointer;font-size:13px;font-weight:700;
+}
+.aba.on{background:linear-gradient(145deg,var(--dourado),#b08f3d);color:#141f38;border-color:transparent}
+.painel{display:none} .painel.on{display:block}
+
+/* ---------- caixas ---------- */
+.box{
+  background:var(--azul-painel);border:1px solid var(--azul-borda);
+  border-radius:var(--raio);padding:16px;box-shadow:var(--sombra);margin-bottom:14px;
+}
+.box > h2{
+  font-size:14px;font-weight:800;letter-spacing:.3px;margin-bottom:12px;
+  display:flex;align-items:center;gap:4px 8px;flex-wrap:wrap;color:var(--dourado-claro);
+}
+.box > h2 small{margin-left:auto;font-size:11.5px;color:var(--texto-fraco);font-weight:600}
+.box.destaque{border:1px solid var(--dourado-fraco);background:linear-gradient(160deg,#132446,#0d1b38)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* ---------- formulários ---------- */
+.campos{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.campo{display:flex;flex-direction:column;gap:5px}
+.campo.full{grid-column:1/-1}
+.campos.duas{grid-template-columns:1fr 1fr}
+.campo label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--texto-fraco)}
+input,select{
+  width:100%;background:var(--azul-campo);border:1px solid var(--azul-borda);color:var(--texto);
+  padding:10px 11px;border-radius:var(--raio-p);font-size:14.5px;font-family:var(--fonte);
+}
+input:focus,select:focus{outline:0;border-color:var(--dourado);box-shadow:0 0 0 3px rgba(217,178,95,.14)}
+input[type=date]{color-scheme:dark}
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios label{
+  display:flex;align-items:center;gap:6px;background:var(--azul-campo);border:1px solid var(--azul-borda);
+  padding:9px 12px;border-radius:var(--raio-p);cursor:pointer;font-size:13.5px;font-weight:600;
+  text-transform:none;letter-spacing:0;color:var(--texto);
+}
+.radios label:has(input:checked){border-color:var(--dourado);background:rgba(217,178,95,.12);color:var(--dourado-claro)}
+.radios input{width:auto;accent-color:var(--dourado)}
+.dica{font-size:12px;color:var(--texto-fraco);margin-top:9px;line-height:1.5}
+
+/* ---------- pendências ---------- */
+.pend{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  background:var(--azul-painel-2);border:1px solid var(--azul-borda);
+  border-left:5px solid var(--azul-borda);
+  border-radius:var(--raio-p);padding:11px 13px;margin-bottom:9px;
+}
+.pend.vencida{border-left-color:var(--vermelho);background:rgba(255,107,107,.07)}
+.pend.hoje{border-left-color:var(--dourado);background:rgba(217,178,95,.09)}
+.pend.receber{border-left-color:var(--verde)}
+.pend.receber.vencida{border-left-color:var(--vermelho)}
+.pend.receber.hoje{border-left-color:var(--dourado)}
+.pend .dt{min-width:52px;text-align:center}
+.pend .dt b{display:block;font-size:15px;font-weight:800;line-height:1.1}
+.pend .dt span{font-size:10px;color:var(--texto-fraco);text-transform:uppercase;letter-spacing:.5px}
+.pend .info{flex:1;min-width:150px}
+.pend .info b{font-size:14px;font-weight:700;display:block}
+.pend .info span{font-size:11.5px;color:var(--texto-fraco)}
+.pend .val{font-size:15.5px;font-weight:800;white-space:nowrap}
+.pend .val.e{color:var(--verde)} .pend .val.s{color:var(--vermelho)}
+.pend .bts{display:flex;gap:6px}
+.tag{
+  display:inline-block;font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;
+  padding:2px 7px;border-radius:999px;border:1px solid var(--azul-borda);color:var(--texto-fraco);
+}
+.tag.venc{border-color:var(--vermelho);color:var(--vermelho);background:rgba(255,107,107,.1)}
+.tag.hj{border-color:var(--dourado);color:var(--dourado);background:rgba(217,178,95,.12)}
+
+/* ---------- meta ---------- */
+.barra{height:15px;background:var(--azul-campo);border-radius:999px;overflow:hidden;border:1px solid var(--azul-borda);margin:12px 0 9px}
+.barra div{height:100%;background:linear-gradient(90deg,#b08f3d,var(--dourado-claro));border-radius:999px;transition:width .5s ease;min-width:2px}
+.frase{font-size:14.5px;line-height:1.6}
+.frase b{color:var(--dourado-claro)}
+
+/* ---------- ritual ---------- */
+.ritual{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
+.rit{background:var(--azul-painel-2);border:1px solid var(--azul-borda);border-radius:var(--raio-p);padding:12px 13px}
+.rit h4{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--texto-fraco);margin-bottom:6px}
+.rit .n{font-size:19px;font-weight:800}
+.rit ul{list-style:none;margin-top:7px;font-size:12.5px;color:var(--texto-fraco)}
+.rit li{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px dashed rgba(255,255,255,.06)}
+.rit li:last-child{border:0}
+.alertas{margin-top:11px;display:flex;flex-direction:column;gap:7px}
+.alerta{padding:10px 12px;border-radius:var(--raio-p);font-size:13px;font-weight:600;display:flex;gap:8px;align-items:center}
+.alerta.r{background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.4);color:#ffb3b3}
+.alerta.d{background:rgba(217,178,95,.12);border:1px solid var(--dourado-fraco);color:var(--dourado-claro)}
+.alerta.ok{background:rgba(52,201,138,.1);border:1px solid rgba(52,201,138,.35);color:#9ae8c6}
+
+/* ---------- tabelas ---------- */
+.tab{width:100%;border-collapse:collapse;font-size:13.5px}
+.tab th{
+  text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--texto-fraco);
+  padding:8px 9px;border-bottom:1px solid var(--azul-borda);font-weight:700;
+}
+.tab td{padding:9px;border-bottom:1px solid rgba(255,255,255,.05);vertical-align:middle}
+.tab tr:last-child td{border-bottom:0}
+.tab .num{text-align:right;font-weight:700;white-space:nowrap}
+.mini{height:7px;background:var(--azul-campo);border-radius:999px;overflow:hidden;margin-top:5px}
+.mini div{height:100%;background:linear-gradient(90deg,#b08f3d,var(--dourado));border-radius:999px}
+.mini.v div{background:linear-gradient(90deg,#1f7d58,var(--verde))}
+
+/* ---------- gráfico ---------- */
+.gr{display:flex;align-items:flex-end;gap:10px;height:210px;padding:10px 4px 0;overflow-x:auto}
+.gcol{flex:1;min-width:52px;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%}
+.gbars{flex:1;display:flex;align-items:flex-end;justify-content:center;gap:5px;width:100%}
+.gbar{width:26px;border-radius:6px 6px 0 0;position:relative;min-height:3px;transition:height .5s ease}
+.gbar.e{background:linear-gradient(180deg,var(--verde),#1c6f4d)}
+.gbar.s{background:linear-gradient(180deg,var(--vermelho),#8f3232)}
+.gcol .vl{display:flex;gap:7px;font-size:10.5px;font-weight:700;letter-spacing:-.2px}
+.gcol .lb{font-size:10.5px;color:var(--texto-fraco);text-transform:uppercase;letter-spacing:.4px;font-weight:700}
+.leg{display:flex;gap:16px;justify-content:center;margin-top:10px;font-size:12px;color:var(--texto-fraco)}
+.leg i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+.vazio{text-align:center;color:var(--texto-fraco);font-size:13.5px;padding:22px 10px;line-height:1.6}
+
+/* ---------- toast ---------- */
+#toasts{position:fixed;left:50%;transform:translateX(-50%);bottom:20px;z-index:200;display:flex;flex-direction:column;gap:8px;width:calc(100% - 28px);max-width:400px}
+.toast{
+  background:var(--azul-painel-2);border:1px solid var(--dourado-fraco);color:var(--texto);
+  padding:12px 15px;border-radius:var(--raio-p);box-shadow:var(--sombra);font-size:13.5px;font-weight:600;
+  animation:sobe .25s ease;
+}
+.toast.err{border-color:var(--vermelho);color:#ffc2c2}
+.toast.ok{border-color:rgba(52,201,138,.5)}
+@keyframes sobe{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.rodape{text-align:center;font-size:11.5px;color:var(--texto-fraco);padding:22px 10px 6px;line-height:1.7}
+
+/* ---------- responsivo ---------- */
+@media(max-width:900px){
+  .cards{grid-template-columns:repeat(2,1fr)}
+  .campos{grid-template-columns:repeat(2,1fr)}
+  .grid2{grid-template-columns:1fr}
+}
+@media(max-width:560px){
+  body{font-size:14.5px}
+  .topo{padding:10px 0;gap:9px}
+  .marca{width:100%}
+  .mesnav{flex:1}
+  .mesnav .rot{min-width:0;flex:1}
+  .acoes .btn{flex:1;justify-content:center}
+  .acoes{width:100%}
+  .cards{gap:9px}
+  .card{padding:11px 12px}
+  .card .v{font-size:18px}
+  .campos,.campos.duas{grid-template-columns:1fr}
+  .ritual{grid-template-columns:1fr}
+  .box > h2 small{margin-left:0;width:100%}
+  .box{padding:13px}
+  .pend{gap:9px}
+  .pend .val{width:auto}
+  .pend .bts{width:100%;justify-content:flex-end}
+  .tab{font-size:12.5px}
+  .tab th,.tab td{padding:7px 5px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap topo">
+    <div class="marca">
+      <div class="logo">R$</div>
+      <div>
+        <h1>Dashboard Financeiro</h1>
+        <span>Consultório de Nutrição</span>
+      </div>
+    </div>
+    <div class="mesnav">
+      <button id="mesAnt" title="Mês anterior">‹</button>
+      <div class="rot" id="mesRot">—</div>
+      <button id="mesProx" title="Próximo mês">›</button>
+    </div>
+    <div class="acoes">
+      <button class="btn pequeno" id="btnCsv">⬇ CSV</button>
+      <button class="btn pequeno" id="btnBackup">💾 Backup</button>
+      <button class="btn pequeno" id="btnCarregar">📂 Carregar</button>
+      <input type="file" id="fileIn" accept=".json,application/json" style="display:none">
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="aviso" id="aviso">
+    <span id="avisoTxt"></span>
+    <button class="btn pequeno ouro" id="btnHoje" style="margin-left:auto">↩ Voltar para hoje</button>
+  </div>
+
+  <!-- CARTÕES -->
+  <section class="cards">
+    <div class="card k-caixa"><h3>Caixa atual</h3><div class="v ouro" id="cCaixa">R$ 0,00</div><div class="s" id="cCaixaS">saldo real hoje</div></div>
+    <div class="card k-ent"><h3>Entradas do mês</h3><div class="v pos" id="cEnt">R$ 0,00</div><div class="s" id="cEntS">—</div></div>
+    <div class="card k-sai"><h3>Saídas do mês</h3><div class="v neg" id="cSai">R$ 0,00</div><div class="s" id="cSaiS">—</div></div>
+    <div class="card k-luc"><h3>Lucro do mês</h3><div class="v" id="cLuc">R$ 0,00</div><div class="s" id="cLucS">—</div></div>
+    <div class="card"><h3>A receber</h3><div class="v pos" id="cRec">R$ 0,00</div><div class="s" id="cRecS">—</div></div>
+    <div class="card"><h3>A pagar</h3><div class="v neg" id="cPag">R$ 0,00</div><div class="s" id="cPagS">—</div></div>
+    <div class="card"><h3>Ticket médio do mês</h3><div class="v" id="cTic">R$ 0,00</div><div class="s" id="cTicS">—</div></div>
+    <div class="card"><h3>% em planos</h3><div class="v ouro" id="cPlano">0%</div><div class="s" id="cPlanoS">receita recorrente</div></div>
+  </section>
+
+  <!-- ABAS -->
+  <nav class="abas">
+    <button class="aba on" data-p="p-ritual">🗓 Sexta Financeira</button>
+    <button class="aba" data-p="p-lancar">➕ Lançar</button>
+    <button class="aba" data-p="p-pend">⏳ Pendências <span id="badgePend"></span></button>
+    <button class="aba" data-p="p-fech">📊 Fechamento</button>
+    <button class="aba" data-p="p-ajustes">⚙️ Ajustes</button>
+  </nav>
+
+  <!-- ============ RITUAL ============ -->
+  <div class="painel on" id="p-ritual">
+    <div class="box destaque">
+      <h2>🗓 Sexta Financeira <small id="ritData"></small></h2>
+      <div class="ritual">
+        <div class="rit">
+          <h4>Entrou nos últimos 7 dias</h4>
+          <div class="n" style="color:var(--verde)" id="r7ent">R$ 0,00</div>
+          <ul id="r7entL"></ul>
+        </div>
+        <div class="rit">
+          <h4>Saiu nos últimos 7 dias</h4>
+          <div class="n" style="color:var(--vermelho)" id="r7sai">R$ 0,00</div>
+          <ul id="r7saiL"></ul>
+        </div>
+        <div class="rit">
+          <h4>Vence a receber (próx. 7 dias)</h4>
+          <div class="n" style="color:var(--dourado)" id="r7vr">R$ 0,00</div>
+          <ul id="r7vrL"></ul>
+        </div>
+        <div class="rit">
+          <h4>Vence a pagar (próx. 7 dias)</h4>
+          <div class="n" style="color:var(--dourado)" id="r7vp">R$ 0,00</div>
+          <ul id="r7vpL"></ul>
+        </div>
+      </div>
+      <div class="alertas" id="ritAlertas"></div>
+    </div>
+
+    <div class="box">
+      <h2>🎯 Meta do mês <small id="metaMes"></small></h2>
+      <div class="campos duas">
+        <div class="campo"><label>Meta de faturamento (R$)</label><input type="number" step="0.01" min="0" id="inMeta" placeholder="0,00"></div>
+        <div class="campo"><label>Preço do plano principal (R$)</label><input type="number" step="0.01" min="0" id="inPlano" placeholder="0,00"></div>
+      </div>
+      <div class="barra"><div id="metaBar" style="width:0%"></div></div>
+      <p class="frase" id="metaFrase">Defina sua meta acima para acompanhar o progresso.</p>
+    </div>
+  </div>
+
+  <!-- ============ LANÇAR ============ -->
+  <div class="painel" id="p-lancar">
+    <div class="box">
+      <h2>💰 Registrar venda</h2>
+      <div class="campos">
+        <div class="campo"><label>Data</label><input type="date" id="vData"></div>
+        <div class="campo"><label>Paciente</label><input type="text" id="vPac" placeholder="Nome do paciente"></div>
+        <div class="campo"><label>Serviço</label>
+          <input type="text" id="vServ" list="servicos" placeholder="Consulta, plano...">
+          <datalist id="servicos">
+            <option value="Consulta inicial"><option value="Retorno"><option value="Plano mensal">
+            <option value="Plano trimestral"><option value="Plano semestral"><option value="Avaliação corporal">
+            <option value="Pacote de acompanhamento">
+          </datalist>
+        </div>
+        <div class="campo"><label>Valor total (R$)</label><input type="number" step="0.01" min="0" id="vValor" placeholder="0,00"></div>
+        <div class="campo"><label>Forma de pagamento</label>
+          <select id="vForma">
+            <option>Pix</option><option>Dinheiro</option><option>Débito</option><option>Crédito</option><option>Transferência</option>
+          </select>
+        </div>
+        <div class="campo"><label>Pagamento</label>
+          <select id="vParc">
+            <option value="1">À vista</option>
+            <option value="2">Parcelado 2x</option><option value="3">3x</option><option value="4">4x</option>
+            <option value="5">5x</option><option value="6">6x</option><option value="7">7x</option>
+            <option value="8">8x</option><option value="9">9x</option><option value="10">10x</option>
+            <option value="11">11x</option><option value="12">12x</option>
+          </select>
+        </div>
+        <div class="campo" id="wrap1a" style="display:none"><label>Data da 1ª parcela</label><input type="date" id="vData1"></div>
+        <div class="campo"><label>Tipo de receita</label>
+          <div class="radios">
+            <label><input type="checkbox" id="vPlanoChk"> É plano (recorrente)</label>
+          </div>
+        </div>
+        <div class="campo full">
+          <button class="btn ouro" id="btnVenda" style="justify-content:center;padding:12px">✓ Registrar venda</button>
+        </div>
+      </div>
+      <p class="dica" id="vDica">A 1ª parcela entra como recebimento; as parcelas seguintes viram contas a receber automaticamente, uma por mês.</p>
+    </div>
+
+    <div class="box">
+      <h2>🧾 Registrar despesa</h2>
+      <div class="campos">
+        <div class="campo"><label>Data</label><input type="date" id="dData"></div>
+        <div class="campo"><label>Descrição</label><input type="text" id="dDesc" placeholder="Ex.: aluguel da sala"></div>
+        <div class="campo"><label>Categoria</label>
+          <select id="dCat">
+            <optgroup label="Custos fixos">
+              <option>Sala / aluguel</option><option>Sistema / app</option><option>Contador</option>
+              <option>Marketing</option><option>Pró-labore</option>
+            </optgroup>
+            <optgroup label="Custos variáveis">
+              <option>Materiais</option><option>Cursos</option><option>Taxas de cartão</option>
+              <option>Impulsionamento</option><option>Outros</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="campo"><label>Valor (R$)</label><input type="number" step="0.01" min="0" id="dValor" placeholder="0,00"></div>
+        <div class="campo full"><label>Situação</label>
+          <div class="radios">
+            <label><input type="radio" name="dSit" value="pago" checked> Já paguei (baixa no caixa)</label>
+            <label><input type="radio" name="dSit" value="agendar"> Agendar (conta a pagar)</label>
+          </div>
+        </div>
+        <div class="campo full">
+          <button class="btn ouro" id="btnDespesa" style="justify-content:center;padding:12px">✓ Registrar despesa</button>
+        </div>
+      </div>
+      <p class="dica">Em <b>agendar</b>, a data informada é o vencimento e a despesa aparece em Pendências até você dar baixa.</p>
+    </div>
+
+    <div class="box">
+      <h2>↕ Outro lançamento no caixa</h2>
+      <div class="campos">
+        <div class="campo"><label>Data</label><input type="date" id="oData"></div>
+        <div class="campo"><label>Descrição</label><input type="text" id="oDesc" placeholder="Ex.: aporte, reembolso"></div>
+        <div class="campo"><label>Tipo</label><select id="oTipo"><option value="entrada">Entrada</option><option value="saida">Saída</option></select></div>
+        <div class="campo"><label>Valor (R$)</label><input type="number" step="0.01" min="0" id="oValor" placeholder="0,00"></div>
+        <div class="campo full"><button class="btn" id="btnOutro" style="justify-content:center;padding:11px">Lançar</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PENDÊNCIAS ============ -->
+  <div class="painel" id="p-pend">
+    <div class="box">
+      <h2>⏳ Contas a receber e a pagar <small id="pendResumo"></small></h2>
+      <div class="radios" style="margin-bottom:13px">
+        <label><input type="radio" name="fPend" value="todas" checked> Todas</label>
+        <label><input type="radio" name="fPend" value="receber"> A receber</label>
+        <label><input type="radio" name="fPend" value="pagar"> A pagar</label>
+        <label><input type="radio" name="fPend" value="vencidas"> Só vencidas</label>
+      </div>
+      <div id="listaPend"></div>
+    </div>
+  </div>
+
+  <!-- ============ FECHAMENTO ============ -->
+  <div class="painel" id="p-fech">
+    <div class="grid2">
+      <div class="box">
+        <h2>📉 Despesas por categoria <small id="fechCatTot"></small></h2>
+        <div id="fechCat"></div>
+      </div>
+      <div class="box">
+        <h2>💳 Entradas por forma de pagamento <small id="fechFormaTot"></small></h2>
+        <div id="fechForma"></div>
+        <p class="dica" id="dicaTaxa"></p>
+      </div>
+    </div>
+
+    <div class="box">
+      <h2>📊 Últimos 6 meses</h2>
+      <div class="gr" id="grafico"></div>
+      <div class="leg">
+        <span><i style="background:var(--verde)"></i>Entradas</span>
+        <span><i style="background:var(--vermelho)"></i>Saídas</span>
+      </div>
+    </div>
+
+    <div class="box">
+      <h2>📒 Lançamentos do mês <small id="lancTot"></small></h2>
+      <div style="overflow-x:auto"><table class="tab" id="tabLanc"></table></div>
+    </div>
+  </div>
+
+  <!-- ============ AJUSTES ============ -->
+  <div class="painel" id="p-ajustes">
+    <div class="box">
+      <h2>⚙️ Saldo inicial</h2>
+      <div class="campos duas">
+        <div class="campo"><label>Quanto você tinha em caixa antes de começar (R$)</label><input type="number" step="0.01" id="inSaldo" placeholder="0,00"></div>
+      </div>
+      <p class="dica">Esse valor é a base do <b>Caixa atual</b>. Some conta do consultório + dinheiro reservado.</p>
+    </div>
+    <div class="box">
+      <h2>💾 Seus dados</h2>
+      <p class="dica" style="margin:0 0 12px">
+        Tudo fica salvo <b>neste navegador</b> (localStorage), automaticamente a cada alteração. Nada vai para a internet.<br>
+        Faça um backup <b>.json</b> de vez em quando — se você limpar o navegador ou trocar de celular, o backup é o que salva.
+      </p>
+      <div class="acoes">
+        <button class="btn" id="btnCsv2">⬇ Exportar CSV</button>
+        <button class="btn" id="btnBackup2">💾 Salvar backup .json</button>
+        <button class="btn" id="btnCarregar2">📂 Carregar backup .json</button>
+        <button class="btn" id="btnDemo">🧪 Carregar dados de exemplo</button>
+        <button class="btn perigo" id="btnLimpar">🗑 Apagar tudo</button>
+      </div>
+      <p class="dica" id="statusDados"></p>
+    </div>
+  </div>
+
+  <p class="rodape">
+    Dashboard Financeiro · funciona 100% offline, sem servidor e sem login.<br>
+    Guarde este arquivo em um lugar seguro e faça backup .json com frequência.
+  </p>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   ESTADO
+   ============================================================ */
+const CHAVE = "dashfin_nutri_v1";
+
+const estado_padrao = () => ({
+  saldoInicial: 0,
+  meta: 0,
+  precoPlano: 0,
+  vendas: [],   // {id,data,paciente,servico,valor,forma,parcelas,plano}
+  movs: []      // {id,tipo,data,venc,desc,pessoa,valor,forma,categoria,plano,status,parc,grupo}
+});
+
+let S = estado_padrao();
+let ui = { ano: 0, mes: 0 };        // mês em exibição
+let filtroPend = "todas";
+
+/* ============================================================
+   UTILITÁRIOS
+   ============================================================ */
+const $ = id => document.getElementById(id);
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+
+function hojeStr(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+function pd(s){ const [y,m,d] = String(s).split("-").map(Number); return {y, m, d}; }
+function chaveMes(s){ return String(s).slice(0,7); }
+function ultimoDia(y,m){ return new Date(y, m, 0).getDate(); }
+function addMeses(s, n){
+  const {y,m,d} = pd(s);
+  let ty = y, tm = m + n;
+  ty += Math.floor((tm - 1) / 12);
+  tm = ((tm - 1) % 12 + 12) % 12 + 1;
+  const dia = Math.min(d, ultimoDia(ty, tm));
+  return `${ty}-${String(tm).padStart(2,"0")}-${String(dia).padStart(2,"0")}`;
+}
+function difDias(a, b){ // b - a, em dias
+  const A = pd(a), B = pd(b);
+  return Math.round((Date.UTC(B.y,B.m-1,B.d) - Date.UTC(A.y,A.m-1,A.d)) / 86400000);
+}
+function addDias(s, n){
+  const {y,m,d} = pd(s);
+  const dt = new Date(Date.UTC(y, m-1, d + n));
+  return `${dt.getUTCFullYear()}-${String(dt.getUTCMonth()+1).padStart(2,"0")}-${String(dt.getUTCDate()).padStart(2,"0")}`;
+}
+const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
+const MESES = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+const MESES_C = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+
+function brl(n){
+  return "R$ " + (Number(n)||0).toLocaleString("pt-BR", {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function ddmm(s){ const {m,d} = pd(s); return `${String(d).padStart(2,"0")}/${String(m).padStart(2,"0")}`; }
+function ddmmaa(s){ const {y,m,d} = pd(s); return `${String(d).padStart(2,"0")}/${String(m).padStart(2,"0")}/${y}`; }
+function ddmmAno(s){ // dd/mm, com o ano só quando for diferente do ano corrente
+  const {y} = pd(s);
+  return ddmm(s) + (y !== new Date().getFullYear() ? "/" + String(y).slice(2) : "");
+}
+function compacto(n){ // 1.234 -> 1,2k  (rótulos do gráfico)
+  n = Number(n) || 0;
+  if (n === 0) return "—";
+  if (n >= 1000) return (n/1000).toFixed(n >= 10000 ? 0 : 1).replace(".", ",") + "k";
+  return String(Math.round(n));
+}
+function esc(t){ return String(t==null?"":t).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function num(v){ const n = parseFloat(String(v).replace(",",".")); return isNaN(n) ? 0 : n; }
+
+/* ---- toast (substitui alert) ---- */
+function toast(msg, tipo){
+  const el = document.createElement("div");
+  el.className = "toast " + (tipo || "");
+  el.textContent = msg;
+  $("toasts").appendChild(el);
+  setTimeout(() => { el.style.transition = ".3s"; el.style.opacity = "0"; el.style.transform = "translateY(8px)"; }, 2600);
+  setTimeout(() => el.remove(), 3000);
+}
+
+/* ---- confirmação em dois cliques (substitui confirm) ---- */
+const armados = new WeakMap();
+function confirmar(btn, textoConfirma, acao){
+  if (armados.get(btn)) {
+    clearTimeout(armados.get(btn).t);
+    armados.delete(btn);
+    acao();
+    return;
+  }
+  const original = btn.innerHTML;
+  btn.innerHTML = textoConfirma;
+  btn.classList.add("armado");
+  const t = setTimeout(() => {
+    btn.innerHTML = original;
+    btn.classList.remove("armado");
+    armados.delete(btn);
+  }, 3500);
+  armados.set(btn, {t, original});
+}
+
+/* ============================================================
+   PERSISTÊNCIA
+   ============================================================ */
+function salvar(){
+  try{
+    localStorage.setItem(CHAVE, JSON.stringify(S));
+    const st = $("statusDados");
+    if (st) st.textContent = `Salvo automaticamente · ${S.movs.length} lançamento(s), ${S.vendas.length} venda(s).`;
+  }catch(e){
+    toast("Não consegui salvar no navegador. Faça um backup .json!", "err");
+  }
+}
+function carregar(){
+  try{
+    const cru = localStorage.getItem(CHAVE);
+    if (!cru) return;
+    const o = JSON.parse(cru);
+    S = Object.assign(estado_padrao(), o);
+    S.vendas = Array.isArray(S.vendas) ? S.vendas : [];
+    S.movs   = Array.isArray(S.movs)   ? S.movs   : [];
+  }catch(e){
+    toast("Dados salvos estavam corrompidos. Comecei do zero.", "err");
+    S = estado_padrao();
+  }
+}
+function mudou(){ salvar(); render(); }
+
+/* ============================================================
+   CÁLCULOS
+   ============================================================ */
+const liquidados = () => S.movs.filter(m => m.status === "ok");
+const pendentes  = () => S.movs.filter(m => m.status === "pend");
+const soma = arr => arr.reduce((a, m) => a + (Number(m.valor) || 0), 0);
+
+function caixaAtual(){
+  const L = liquidados();
+  return (Number(S.saldoInicial) || 0)
+       + soma(L.filter(m => m.tipo === "entrada"))
+       - soma(L.filter(m => m.tipo === "saida"));
+}
+function mesSel(){ return `${ui.ano}-${String(ui.mes).padStart(2,"0")}`; }
+function doMes(arr, mk){ return arr.filter(m => chaveMes(m.data) === mk); }
+
+function entradasMes(mk){ return doMes(liquidados().filter(m => m.tipo === "entrada"), mk); }
+function saidasMes(mk){ return doMes(liquidados().filter(m => m.tipo === "saida"), mk); }
+
+/* ============================================================
+   AÇÕES — VENDA
+   ============================================================ */
+function registrarVenda(){
+  const data   = $("vData").value;
+  const pac    = $("vPac").value.trim();
+  const serv   = $("vServ").value.trim();
+  const valor  = num($("vValor").value);
+  const forma  = $("vForma").value;
+  const parc   = parseInt($("vParc").value, 10);
+  const plano  = $("vPlanoChk").checked;
+  const data1  = parc > 1 ? ($("vData1").value || data) : data;
+
+  if (!data)          return toast("Informe a data da venda.", "err");
+  if (!pac)           return toast("Informe o nome do paciente.", "err");
+  if (valor <= 0)     return toast("Informe um valor maior que zero.", "err");
+  if (parc > 1 && !data1) return toast("Informe a data da 1ª parcela.", "err");
+
+  const idv = uid();
+  S.vendas.push({ id:idv, data, paciente:pac, servico:serv || "Atendimento", valor, forma, parcelas:parc, plano });
+
+  const base = Math.round(valor / parc * 100) / 100;
+  for (let i = 1; i <= parc; i++){
+    // a última parcela absorve a diferença de arredondamento
+    const v = (i === parc) ? Math.round((valor - base * (parc - 1)) * 100) / 100 : base;
+    const dv = addMeses(data1, i - 1);
+    S.movs.push({
+      id: uid(), grupo: idv, tipo: "entrada",
+      data: dv,   // se liquidada é a data do recebimento; se pendente, espelha o vencimento
+      venc: dv,
+      desc: (serv || "Atendimento") + (parc > 1 ? ` (${i}/${parc})` : ""),
+      pessoa: pac, valor: v, forma, categoria: "", plano,
+      status: i === 1 ? "ok" : "pend",
+      parc: parc > 1 ? `${i}/${parc}` : ""
+    });
+  }
+  // limpa
+  $("vPac").value = ""; $("vServ").value = ""; $("vValor").value = "";
+  $("vParc").value = "1"; $("vPlanoChk").checked = false; toggleParc();
+  mudou();
+  toast(parc > 1
+    ? `Venda registrada · 1ª parcela no caixa e ${parc-1} parcela(s) em contas a receber.`
+    : `Venda de ${brl(valor)} registrada.`, "ok");
+}
+
+/* ============================================================
+   AÇÕES — DESPESA
+   ============================================================ */
+function registrarDespesa(){
+  const data  = $("dData").value;
+  const desc  = $("dDesc").value.trim();
+  const cat   = $("dCat").value;
+  const valor = num($("dValor").value);
+  const sit   = document.querySelector('input[name="dSit"]:checked').value;
+
+  if (!data)      return toast("Informe a data.", "err");
+  if (!desc)      return toast("Informe a descrição da despesa.", "err");
+  if (valor <= 0) return toast("Informe um valor maior que zero.", "err");
+
+  S.movs.push({
+    id: uid(), grupo: "", tipo: "saida",
+    data, venc: data, desc, pessoa: "", valor, forma: "", categoria: cat, plano: false,
+    status: sit === "pago" ? "ok" : "pend", parc: ""
+  });
+  $("dDesc").value = ""; $("dValor").value = "";
+  mudou();
+  toast(sit === "pago" ? `Despesa de ${brl(valor)} baixada no caixa.` : `Conta a pagar agendada para ${ddmm(data)}.`, "ok");
+}
+
+function registrarOutro(){
+  const data  = $("oData").value;
+  const desc  = $("oDesc").value.trim();
+  const tipo  = $("oTipo").value;
+  const valor = num($("oValor").value);
+  if (!data)      return toast("Informe a data.", "err");
+  if (!desc)      return toast("Informe a descrição.", "err");
+  if (valor <= 0) return toast("Informe um valor maior que zero.", "err");
+  S.movs.push({
+    id: uid(), grupo: "", tipo, data, venc: data, desc, pessoa: "", valor,
+    forma: tipo === "entrada" ? "Outros" : "", categoria: tipo === "saida" ? "Outros" : "",
+    plano: false, status: "ok", parc: ""
+  });
+  $("oDesc").value = ""; $("oValor").value = "";
+  mudou();
+  toast("Lançamento registrado.", "ok");
+}
+
+/* ============================================================
+   AÇÕES — BAIXA / EXCLUSÃO
+   ============================================================ */
+function darBaixa(id){
+  const m = S.movs.find(x => x.id === id);
+  if (!m) return;
+  m.status = "ok";
+  m.data = hojeStr();           // entra no caixa hoje
+  mudou();
+  toast(m.tipo === "entrada" ? `Recebimento de ${brl(m.valor)} no caixa.` : `Pagamento de ${brl(m.valor)} baixado.`, "ok");
+}
+function excluirMov(id){
+  const i = S.movs.findIndex(x => x.id === id);
+  if (i < 0) return;
+  const m = S.movs[i];
+  S.movs.splice(i, 1);
+  // se era a única sobra de uma venda, remove a venda também
+  if (m.grupo && !S.movs.some(x => x.grupo === m.grupo)){
+    const j = S.vendas.findIndex(v => v.id === m.grupo);
+    if (j >= 0) S.vendas.splice(j, 1);
+  }
+  mudou();
+  toast("Lançamento excluído.");
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function render(){
+  renderMes();
+  renderCards();
+  renderRitual();
+  renderMeta();
+  renderPend();
+  renderFechamento();
+}
+
+function renderMes(){
+  $("mesRot").textContent = `${cap(MESES[ui.mes-1])} de ${ui.ano}`;
+  const h = pd(hojeStr());
+  const atual = (h.y === ui.ano && h.m === ui.mes);
+  $("aviso").classList.toggle("on", !atual);
+  if (!atual){
+    const dif = (ui.ano - h.y) * 12 + (ui.mes - h.m);
+    $("avisoTxt").textContent = dif < 0
+      ? `👀 Você está vendo ${MESES[ui.mes-1]} de ${ui.ano} — um mês passado. Os indicadores do topo (fora o Caixa atual) são desse mês.`
+      : `👀 Você está vendo ${MESES[ui.mes-1]} de ${ui.ano} — um mês futuro. Os indicadores do topo (fora o Caixa atual) são desse mês.`;
+  }
+}
+
+function renderCards(){
+  const mk = mesSel(), hoje = hojeStr();
+  const ent = entradasMes(mk), sai = saidasMes(mk);
+  const tEnt = soma(ent), tSai = soma(sai), luc = tEnt - tSai;
+
+  $("cCaixa").textContent = brl(caixaAtual());
+  $("cCaixaS").textContent = `saldo inicial ${brl(S.saldoInicial)} + histórico`;
+
+  $("cEnt").textContent = brl(tEnt);
+  $("cEntS").textContent = `${ent.length} recebimento(s)`;
+  $("cSai").textContent = brl(tSai);
+  $("cSaiS").textContent = `${sai.length} pagamento(s)`;
+
+  const lc = $("cLuc");
+  lc.textContent = brl(luc);
+  lc.className = "v " + (luc >= 0 ? "pos" : "neg");
+  $("cLucS").textContent = tEnt > 0 ? `margem de ${Math.round(luc / tEnt * 100)}%` : "sem entradas no mês";
+
+  const pr = pendentes().filter(m => m.tipo === "entrada");
+  const pp = pendentes().filter(m => m.tipo === "saida");
+  const vencR = pr.filter(m => difDias(m.venc, hoje) > 0);
+  const vencP = pp.filter(m => difDias(m.venc, hoje) > 0);
+  $("cRec").textContent = brl(soma(pr));
+  $("cRecS").textContent = pr.length ? `${pr.length} título(s)` + (vencR.length ? ` · ${vencR.length} vencido(s)` : "") : "nada em aberto";
+  $("cPag").textContent = brl(soma(pp));
+  $("cPagS").textContent = pp.length ? `${pp.length} conta(s)` + (vencP.length ? ` · ${vencP.length} vencida(s)` : "") : "nada em aberto";
+
+  const vm = S.vendas.filter(v => chaveMes(v.data) === mk);
+  const tk = vm.length ? soma(vm) / vm.length : 0;
+  $("cTic").textContent = brl(tk);
+  $("cTicS").textContent = vm.length ? `${vm.length} venda(s) no mês` : "nenhuma venda no mês";
+
+  const entPlano = soma(ent.filter(m => m.plano));
+  const pct = tEnt > 0 ? Math.round(entPlano / tEnt * 100) : 0;
+  $("cPlano").textContent = pct + "%";
+  $("cPlanoS").textContent = tEnt > 0 ? `${brl(entPlano)} vieram de planos` : "receita recorrente";
+
+  const bp = $("badgePend");
+  const nAtras = vencR.length + vencP.length;
+  bp.textContent = nAtras ? `(${nAtras}!)` : (pr.length + pp.length ? `(${pr.length + pp.length})` : "");
+  bp.style.color = nAtras ? "var(--vermelho)" : "";
+}
+
+function renderRitual(){
+  const hoje = hojeStr();
+  const ini = addDias(hoje, -6);   // últimos 7 dias, contando hoje
+  const fim7 = addDias(hoje, 7);   // próximos 7 dias
+
+  $("ritData").textContent = `de ${ddmm(ini)} a ${ddmm(hoje)} · hoje é ${ddmmaa(hoje)}`;
+
+  const L = liquidados();
+  const ent7 = L.filter(m => m.tipo === "entrada" && difDias(ini, m.data) >= 0 && difDias(m.data, hoje) >= 0);
+  const sai7 = L.filter(m => m.tipo === "saida"   && difDias(ini, m.data) >= 0 && difDias(m.data, hoje) >= 0);
+  const P = pendentes();
+  const vr7 = P.filter(m => m.tipo === "entrada" && difDias(hoje, m.venc) >= 0 && difDias(m.venc, fim7) >= 0);
+  const vp7 = P.filter(m => m.tipo === "saida"   && difDias(hoje, m.venc) >= 0 && difDias(m.venc, fim7) >= 0);
+
+  const li = (arr, campo) => arr.length
+    ? arr.slice().sort((a,b) => (a[campo] < b[campo] ? -1 : 1)).slice(0,5)
+        .map(m => `<li><span>${ddmm(m[campo])} · ${esc((m.pessoa || m.desc || "").slice(0,26))}</span><b>${brl(m.valor)}</b></li>`).join("")
+    : `<li style="justify-content:center;opacity:.6">nada por aqui</li>`;
+
+  $("r7ent").textContent = brl(soma(ent7)); $("r7entL").innerHTML = li(ent7, "data");
+  $("r7sai").textContent = brl(soma(sai7)); $("r7saiL").innerHTML = li(sai7, "data");
+  $("r7vr").textContent  = brl(soma(vr7));  $("r7vrL").innerHTML  = li(vr7, "venc");
+  $("r7vp").textContent  = brl(soma(vp7));  $("r7vpL").innerHTML  = li(vp7, "venc");
+
+  const vencidas = P.filter(m => difDias(m.venc, hoje) > 0);
+  const hojeVence = P.filter(m => m.venc === hoje);
+  const al = [];
+  if (vencidas.length){
+    const r = vencidas.filter(m => m.tipo === "entrada"), p = vencidas.filter(m => m.tipo === "saida");
+    al.push(`<div class="alerta r">🔴 <span><b>${vencidas.length} pendência(s) vencida(s)</b> — ${brl(soma(r))} a receber e ${brl(soma(p))} a pagar. Cobre e quite hoje.</span></div>`);
+  }
+  if (hojeVence.length){
+    al.push(`<div class="alerta d">🟡 <span><b>${hojeVence.length} vence(m) hoje</b> — total de ${brl(soma(hojeVence))}.</span></div>`);
+  }
+  const saldo7 = soma(ent7) - soma(sai7);
+  al.push(`<div class="alerta ${saldo7 >= 0 ? "ok" : "r"}">${saldo7 >= 0 ? "✅" : "⚠️"} <span>Saldo dos últimos 7 dias: <b>${brl(saldo7)}</b>. Caixa atual: <b>${brl(caixaAtual())}</b>.</span></div>`);
+  if (!vencidas.length && !hojeVence.length){
+    al.push(`<div class="alerta ok">👏 <span>Nada vencido e nada vencendo hoje. Semana em dia.</span></div>`);
+  }
+  $("ritAlertas").innerHTML = al.join("");
+}
+
+function renderMeta(){
+  const mk = mesSel();
+  const fat = soma(entradasMes(mk));
+  const meta = Number(S.meta) || 0;
+  const preco = Number(S.precoPlano) || 0;
+  $("metaMes").textContent = `${MESES[ui.mes-1]} de ${ui.ano}`;
+  const pct = meta > 0 ? Math.min(100, Math.round(fat / meta * 100)) : 0;
+  $("metaBar").style.width = pct + "%";
+
+  if (meta <= 0){
+    $("metaFrase").innerHTML = `Faturamento do mês: <b>${brl(fat)}</b>. Defina uma meta acima para acompanhar o progresso.`;
+    return;
+  }
+  const falta = Math.max(0, meta - fat);
+  const pctReal = Math.round(fat / meta * 100);
+  if (falta <= 0){
+    $("metaFrase").innerHTML = `🏆 <b>Meta batida!</b> Você está em <b>${pctReal}%</b> da meta — ${brl(fat)} de ${brl(meta)}. Passou ${brl(fat - meta)}.`;
+  } else {
+    const vendasFalt = preco > 0 ? Math.ceil(falta / preco) : null;
+    $("metaFrase").innerHTML =
+      `Você está em <b>${pctReal}%</b> da meta. Faltam <b>${brl(falta)}</b>` +
+      (vendasFalt !== null ? ` = <b>${vendasFalt} venda${vendasFalt > 1 ? "s" : ""}</b> do seu plano de ${brl(preco)}.`
+                           : `. Informe o preço do seu plano para eu converter isso em número de vendas.`);
+  }
+}
+
+function renderPend(){
+  const hoje = hojeStr();
+  let P = pendentes().slice().sort((a,b) => a.venc < b.venc ? -1 : a.venc > b.venc ? 1 : 0);
+  if (filtroPend === "receber")  P = P.filter(m => m.tipo === "entrada");
+  if (filtroPend === "pagar")    P = P.filter(m => m.tipo === "saida");
+  if (filtroPend === "vencidas") P = P.filter(m => difDias(m.venc, hoje) > 0);
+
+  const tr = soma(pendentes().filter(m => m.tipo === "entrada"));
+  const tp = soma(pendentes().filter(m => m.tipo === "saida"));
+  $("pendResumo").textContent = `${brl(tr)} a receber · ${brl(tp)} a pagar · saldo ${brl(tr - tp)}`;
+
+  if (!P.length){
+    $("listaPend").innerHTML = `<div class="vazio">Nenhuma pendência aqui.<br>Parcelas futuras de vendas e despesas agendadas aparecem nesta lista automaticamente.</div>`;
+    return;
+  }
+
+  $("listaPend").innerHTML = P.map(m => {
+    const d = difDias(m.venc, hoje);      // >0 vencida, 0 hoje, <0 futura
+    const cls = d > 0 ? "vencida" : d === 0 ? "hoje" : "";
+    const tipo = m.tipo === "entrada" ? "receber" : "pagar";
+    const tag = d > 0 ? `<span class="tag venc">vencida há ${d}d</span>`
+              : d === 0 ? `<span class="tag hj">vence hoje</span>`
+              : `<span class="tag">em ${-d} dia${-d > 1 ? "s" : ""}</span>`;
+    const sub = m.tipo === "entrada"
+      ? `${esc(m.pessoa || "—")}${m.parc ? " · parcela " + m.parc : ""}${m.forma ? " · " + esc(m.forma) : ""}`
+      : `${esc(m.categoria || "—")}`;
+    return `<div class="pend ${tipo} ${cls}">
+      <div class="dt"><b>${ddmmAno(m.venc)}</b><span>venc.</span></div>
+      <div class="info"><b>${esc(m.desc)} ${tag}</b><span>${sub}</span></div>
+      <div class="val ${m.tipo === "entrada" ? "e" : "s"}">${m.tipo === "entrada" ? "+" : "−"} ${brl(m.valor)}</div>
+      <div class="bts">
+        <button class="btn pequeno verde" data-baixa="${m.id}">✓ ${m.tipo === "entrada" ? "Recebi" : "Paguei"}</button>
+        <button class="btn pequeno perigo" data-del="${m.id}">🗑</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderFechamento(){
+  const mk = mesSel();
+  const sai = saidasMes(mk), ent = entradasMes(mk);
+
+  /* despesas por categoria */
+  const cats = {};
+  sai.forEach(m => { const c = m.categoria || "Outros"; cats[c] = (cats[c] || 0) + m.valor; });
+  const listaC = Object.entries(cats).sort((a,b) => b[1] - a[1]);
+  const totC = soma(sai);
+  $("fechCatTot").textContent = totC ? brl(totC) : "";
+  $("fechCat").innerHTML = listaC.length
+    ? `<table class="tab">${listaC.map(([c,v]) => `<tr>
+        <td>${esc(c)}<div class="mini"><div style="width:${totC ? (v/totC*100) : 0}%"></div></div></td>
+        <td class="num">${brl(v)}<div style="font-size:11px;color:var(--texto-fraco);font-weight:600">${totC ? Math.round(v/totC*100) : 0}%</div></td>
+      </tr>`).join("")}</table>`
+    : `<div class="vazio">Nenhuma despesa neste mês.</div>`;
+
+  /* entradas por forma de pagamento */
+  const formas = {};
+  ent.forEach(m => { const f = m.forma || "Outros"; formas[f] = (formas[f] || 0) + m.valor; });
+  const listaF = Object.entries(formas).sort((a,b) => b[1] - a[1]);
+  const totF = soma(ent);
+  $("fechFormaTot").textContent = totF ? brl(totF) : "";
+  $("fechForma").innerHTML = listaF.length
+    ? `<table class="tab">${listaF.map(([f,v]) => `<tr>
+        <td>${esc(f)}<div class="mini v"><div style="width:${totF ? (v/totF*100) : 0}%"></div></div></td>
+        <td class="num">${brl(v)}<div style="font-size:11px;color:var(--texto-fraco);font-weight:600">${totF ? Math.round(v/totF*100) : 0}%</div></td>
+      </tr>`).join("")}</table>`
+    : `<div class="vazio">Nenhuma entrada neste mês.</div>`;
+
+  const taxa = sai.filter(m => (m.categoria || "").toLowerCase().indexOf("taxa") === 0);
+  const tTaxa = soma(taxa);
+  const credito = formas["Crédito"] || 0;
+  $("dicaTaxa").innerHTML = tTaxa > 0
+    ? `💳 Você pagou <b>${brl(tTaxa)}</b> em taxas de cartão este mês` + (credito > 0 ? ` — ${(tTaxa/credito*100).toFixed(1)}% do que entrou no crédito (${brl(credito)}).` : ".")
+    : `💳 Lance as taxas da maquininha como despesa na categoria <b>Taxas de cartão</b> para enxergar quanto some daqui.`;
+
+  /* gráfico 6 meses */
+  const cols = [];
+  for (let i = 5; i >= 0; i--){
+    const dref = addMeses(`${ui.ano}-${String(ui.mes).padStart(2,"0")}-01`, -i);
+    const k = chaveMes(dref);
+    cols.push({ k, mes: pd(dref).m, ano: pd(dref).y, e: soma(entradasMes(k)), s: soma(saidasMes(k)) });
+  }
+  const max = Math.max(1, ...cols.map(c => Math.max(c.e, c.s)));
+  $("grafico").innerHTML = cols.map(c => `
+    <div class="gcol">
+      <div class="gbars">
+        <div class="gbar e" style="height:${Math.max(2, c.e/max*100)}%" title="Entradas ${brl(c.e)}"></div>
+        <div class="gbar s" style="height:${Math.max(2, c.s/max*100)}%" title="Saídas ${brl(c.s)}"></div>
+      </div>
+      <div class="vl"><b style="color:var(--verde)">${compacto(c.e)}</b><b style="color:var(--vermelho)">${compacto(c.s)}</b></div>
+      <div class="lb" style="${c.k === mk ? "color:var(--dourado)" : ""}">${MESES_C[c.mes-1]}${c.ano !== ui.ano ? "/" + String(c.ano).slice(2) : ""}</div>
+    </div>`).join("");
+
+  /* lançamentos do mês */
+  const L = doMes(liquidados(), mk).slice().sort((a,b) => a.data < b.data ? 1 : -1);
+  $("lancTot").textContent = `${L.length} lançamento(s) · saldo ${brl(soma(ent) - soma(sai))}`;
+  $("tabLanc").innerHTML = L.length
+    ? `<thead><tr><th>Data</th><th>Descrição</th><th>Quem / categoria</th><th>Forma</th><th class="num">Valor</th><th></th></tr></thead>
+       <tbody>${L.map(m => `<tr>
+        <td>${ddmm(m.data)}</td>
+        <td>${esc(m.desc)}</td>
+        <td style="color:var(--texto-fraco)">${esc(m.pessoa || m.categoria || "—")}</td>
+        <td style="color:var(--texto-fraco)">${esc(m.forma || "—")}</td>
+        <td class="num" style="color:${m.tipo === "entrada" ? "var(--verde)" : "var(--vermelho)"}">${m.tipo === "entrada" ? "+" : "−"} ${brl(m.valor)}</td>
+        <td style="text-align:right"><button class="btn pequeno perigo" data-del="${m.id}">🗑</button></td>
+      </tr>`).join("")}</tbody>`
+    : `<tbody><tr><td><div class="vazio">Nenhum lançamento liquidado neste mês.</div></td></tr></tbody>`;
+}
+
+/* ============================================================
+   EXPORTAR / IMPORTAR
+   ============================================================ */
+function baixarArquivo(nome, conteudo, tipo){
+  const blob = new Blob([conteudo], {type: tipo});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = nome;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 500);
+}
+function exportarCSV(){
+  if (!S.movs.length) return toast("Não há nada para exportar ainda.", "err");
+  const cab = ["Data","Vencimento","Tipo","Situacao","Descricao","Paciente","Categoria","Forma de pagamento","Parcela","Plano","Valor"];
+  const linhas = S.movs.slice().sort((a,b) => (a.venc||a.data) < (b.venc||b.data) ? -1 : 1).map(m => [
+    ddmmaa(m.data), ddmmaa(m.venc || m.data),
+    m.tipo === "entrada" ? "Entrada" : "Saida",
+    m.status === "ok" ? "Liquidado" : "Pendente",
+    m.desc || "", m.pessoa || "", m.categoria || "", m.forma || "", m.parc || "",
+    m.plano ? "Sim" : "Nao",
+    (Number(m.valor)||0).toFixed(2).replace(".", ",")
+  ]);
+  const q = v => `"${String(v).replace(/"/g, '""')}"`;
+  const csv = "﻿" + [cab, ...linhas].map(l => l.map(q).join(";")).join("\r\n");
+  baixarArquivo(`financeiro-${mesSel()}.csv`, csv, "text/csv;charset=utf-8");
+  toast("CSV exportado. Abra no Excel ou Google Planilhas.", "ok");
+}
+function salvarBackup(){
+  const pacote = { app: "dashboard-financeiro-nutri", versao: 1, gerado_em: hojeStr(), dados: S };
+  baixarArquivo(`backup-financeiro-${hojeStr()}.json`, JSON.stringify(pacote, null, 2), "application/json");
+  toast("Backup .json salvo. Guarde em um lugar seguro.", "ok");
+}
+function aplicarBackup(texto){
+  let o;
+  try { o = JSON.parse(texto); }
+  catch(e){ return toast("Esse arquivo não é um backup válido.", "err"); }
+  const d = o && o.dados ? o.dados : o;
+  if (!d || !Array.isArray(d.movs)) return toast("Backup sem lançamentos reconhecíveis.", "err");
+  S = Object.assign(estado_padrao(), d);
+  S.vendas = Array.isArray(S.vendas) ? S.vendas : [];
+  preencherAjustes();
+  mudou();
+  toast(`Backup carregado · ${S.movs.length} lançamento(s).`, "ok");
+}
+
+/* ============================================================
+   DADOS DE EXEMPLO
+   ============================================================ */
+function carregarDemo(){
+  const h = hojeStr(), p = pd(h);
+  const dia = n => `${p.y}-${String(p.m).padStart(2,"0")}-${String(Math.min(n, ultimoDia(p.y,p.m))).padStart(2,"0")}`;
+  S = estado_padrao();
+  S.saldoInicial = 2500; S.meta = 12000; S.precoPlano = 890;
+
+  const vendas = [
+    {pac:"Ana Ribeiro",   serv:"Plano trimestral", val:1490, forma:"Pix",     parc:1,  plano:true,  d:dia(3)},
+    {pac:"Carlos Menezes",serv:"Consulta inicial", val:350,  forma:"Débito",  parc:1,  plano:false, d:dia(5)},
+    {pac:"Juliana Alves", serv:"Plano semestral",  val:2400, forma:"Crédito", parc:6,  plano:true,  d:dia(8)},
+    {pac:"Marcos Dias",   serv:"Retorno",          val:220,  forma:"Dinheiro",parc:1,  plano:false, d:dia(12)},
+    {pac:"Patrícia Luz",  serv:"Plano mensal",     val:890,  forma:"Pix",     parc:1,  plano:true,  d:dia(15)},
+    {pac:"Renato Souza",  serv:"Plano trimestral", val:1490, forma:"Crédito", parc:3,  plano:true,  d:dia(18)}
+  ];
+  vendas.forEach(v => {
+    const idv = uid();
+    S.vendas.push({id:idv, data:v.d, paciente:v.pac, servico:v.serv, valor:v.val, forma:v.forma, parcelas:v.parc, plano:v.plano});
+    const base = Math.round(v.val / v.parc * 100) / 100;
+    for (let i = 1; i <= v.parc; i++){
+      const val = i === v.parc ? Math.round((v.val - base*(v.parc-1))*100)/100 : base;
+      const dv = addMeses(v.d, i-1);
+      S.movs.push({id:uid(), grupo:idv, tipo:"entrada", data:dv, venc:dv,
+        desc:v.serv + (v.parc>1 ? ` (${i}/${v.parc})` : ""), pessoa:v.pac, valor:val,
+        forma:v.forma, categoria:"", plano:v.plano, status:i===1?"ok":"pend", parc:v.parc>1?`${i}/${v.parc}`:""});
+    }
+  });
+  const desp = [
+    ["Sala / aluguel","Aluguel do consultório",1200,dia(5),"ok"],
+    ["Sistema / app","Assinatura do sistema",89,dia(6),"ok"],
+    ["Contador","Honorários contábeis",320,dia(10),"ok"],
+    ["Taxas de cartão","Taxas da maquininha",118,dia(10),"ok"],
+    ["Marketing","Social media",600,dia(12),"ok"],
+    ["Materiais","Fitas e adipômetro",180,dia(14),"ok"],
+    ["Impulsionamento","Anúncios Instagram",250,dia(28),"pend"],
+    ["Pró-labore","Retirada mensal",3000,dia(30),"pend"]
+  ];
+  desp.forEach(([cat,de,val,dt,st]) => S.movs.push({
+    id:uid(), grupo:"", tipo:"saida", data:dt, venc:dt, desc:de, pessoa:"", valor:val,
+    forma:"", categoria:cat, plano:false, status:st, parc:""
+  }));
+  // mês anterior, para o gráfico ter comparação
+  const ant = addMeses(dia(10), -1);
+  S.movs.push({id:uid(),grupo:"",tipo:"entrada",data:ant,venc:ant,desc:"Faturamento consolidado",pessoa:"Diversos",valor:8900,forma:"Pix",categoria:"",plano:true,status:"ok",parc:""});
+  S.movs.push({id:uid(),grupo:"",tipo:"saida",data:ant,venc:ant,desc:"Custos do mês",pessoa:"",valor:5100,forma:"",categoria:"Outros",plano:false,status:"ok",parc:""});
+
+  preencherAjustes();
+  mudou();
+  toast("Dados de exemplo carregados. Use 'Apagar tudo' quando quiser começar do zero.", "ok");
+}
+
+/* ============================================================
+   INTERFACE
+   ============================================================ */
+function preencherAjustes(){
+  $("inSaldo").value = S.saldoInicial || "";
+  $("inMeta").value  = S.meta || "";
+  $("inPlano").value = S.precoPlano || "";
+}
+function toggleParc(){
+  const n = parseInt($("vParc").value, 10);
+  $("wrap1a").style.display = n > 1 ? "flex" : "none";
+  if (n > 1 && !$("vData1").value) $("vData1").value = $("vData").value || hojeStr();
+  $("vDica").innerHTML = n > 1
+    ? `Vai gerar <b>${n} parcelas</b>: a 1ª entra no caixa na data informada e as outras <b>${n-1}</b> viram contas a receber, uma por mês.`
+    : `A 1ª parcela entra como recebimento; as parcelas seguintes viram contas a receber automaticamente, uma por mês.`;
+}
+function irParaHoje(){
+  const h = pd(hojeStr());
+  ui.ano = h.y; ui.mes = h.m;
+  render();
+}
+function mudarMes(n){
+  let m = ui.mes + n, y = ui.ano;
+  if (m < 1){ m = 12; y--; } if (m > 12){ m = 1; y++; }
+  ui.mes = m; ui.ano = y;
+  render();
+}
+
+function iniciar(){
+  carregar();
+  irParaHoje();
+  preencherAjustes();
+  const h = hojeStr();
+  ["vData","dData","oData","vData1"].forEach(id => { if (!$(id).value) $(id).value = h; });
+
+  /* navegação */
+  $("mesAnt").onclick  = () => mudarMes(-1);
+  $("mesProx").onclick = () => mudarMes(1);
+  $("btnHoje").onclick = irParaHoje;
+
+  document.querySelectorAll(".aba").forEach(b => b.onclick = () => {
+    document.querySelectorAll(".aba").forEach(x => x.classList.remove("on"));
+    document.querySelectorAll(".painel").forEach(x => x.classList.remove("on"));
+    b.classList.add("on");
+    $(b.dataset.p).classList.add("on");
+    window.scrollTo({top: 0, behavior: "smooth"});
+  });
+
+  /* formulários */
+  $("vParc").onchange   = toggleParc;
+  $("vData").onchange   = () => { if (parseInt($("vParc").value,10) > 1) $("vData1").value = $("vData").value; };
+  $("btnVenda").onclick   = registrarVenda;
+  $("btnDespesa").onclick = registrarDespesa;
+  $("btnOutro").onclick   = registrarOutro;
+  toggleParc();
+
+  /* ajustes que salvam sozinhos */
+  $("inSaldo").oninput = e => { S.saldoInicial = num(e.target.value); salvar(); renderCards(); renderRitual(); };
+  $("inMeta").oninput  = e => { S.meta        = num(e.target.value); salvar(); renderMeta(); };
+  $("inPlano").oninput = e => { S.precoPlano  = num(e.target.value); salvar(); renderMeta(); };
+
+  /* filtro de pendências */
+  document.querySelectorAll('input[name="fPend"]').forEach(r => r.onchange = () => { filtroPend = r.value; renderPend(); });
+
+  /* cliques delegados: baixa e exclusão */
+  document.body.addEventListener("click", ev => {
+    const bb = ev.target.closest("[data-baixa]");
+    if (bb){ darBaixa(bb.dataset.baixa); return; }
+    const bd = ev.target.closest("[data-del]");
+    if (bd){ confirmar(bd, "excluir?", () => excluirMov(bd.dataset.del)); return; }
+  });
+
+  /* exportar / importar */
+  const csv = () => exportarCSV(), bkp = () => salvarBackup();
+  $("btnCsv").onclick = csv;  $("btnCsv2").onclick = csv;
+  $("btnBackup").onclick = bkp; $("btnBackup2").onclick = bkp;
+
+  const pedirArquivo = btn => confirmar(btn, "substituir tudo?", () => $("fileIn").click());
+  $("btnCarregar").onclick  = e => pedirArquivo(e.currentTarget);
+  $("btnCarregar2").onclick = e => pedirArquivo(e.currentTarget);
+  $("fileIn").onchange = e => {
+    const f = e.target.files[0]; if (!f) return;
+    const fr = new FileReader();
+    fr.onload = () => aplicarBackup(fr.result);
+    fr.onerror = () => toast("Não consegui ler o arquivo.", "err");
+    fr.readAsText(f);
+    e.target.value = "";
+  };
+
+  $("btnDemo").onclick   = e => confirmar(e.currentTarget, "substituir tudo?", carregarDemo);
+  $("btnLimpar").onclick = e => confirmar(e.currentTarget, "apagar mesmo?", () => {
+    S = estado_padrao(); preencherAjustes(); mudou(); toast("Tudo apagado. Começando do zero.");
+  });
+
+  render();
+  salvar();
+}
+
+document.addEventListener("DOMContentLoaded", iniciar);
+</script>
+</body>
+</html>
