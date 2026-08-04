@@ -139,11 +139,11 @@ button,.btn{font-family:var(--fonte)}
 .campo.full{grid-column:1/-1}
 .campos.duas{grid-template-columns:1fr 1fr}
 .campo label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--texto-fraco)}
-input,select{
+input,select,textarea{
   width:100%;background:var(--azul-campo);border:1px solid var(--azul-borda);color:var(--texto);
   padding:10px 11px;border-radius:var(--raio-p);font-size:14.5px;font-family:var(--fonte);
 }
-input:focus,select:focus{outline:0;border-color:var(--dourado);box-shadow:0 0 0 3px rgba(217,178,95,.14)}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--dourado);box-shadow:0 0 0 3px rgba(217,178,95,.14)}
 input[type=date]{color-scheme:dark}
 .radios{display:flex;gap:8px;flex-wrap:wrap}
 .radios label{
@@ -515,6 +515,18 @@ input[type=date]{color-scheme:dark}
         <button class="btn" id="btnCarregar2">📂 Carregar backup .json</button>
         <button class="btn" id="btnDemo">🧪 Carregar dados de exemplo</button>
         <button class="btn perigo" id="btnLimpar">🗑 Apagar tudo</button>
+      </div>
+      <div style="margin-top:12px">
+        <button class="btn pequeno" id="btnCopia">📋 Mostrar dados para copiar</button>
+        <div id="painelCopia" style="display:none;margin-top:10px">
+          <div class="acoes" style="margin-bottom:8px">
+            <button class="btn pequeno" id="btnCopiaJson">Backup .json</button>
+            <button class="btn pequeno" id="btnCopiaCsv">Planilha CSV</button>
+            <button class="btn pequeno ouro" id="btnCopiaTudo">Copiar</button>
+          </div>
+          <textarea id="txtCopia" readonly rows="7" spellcheck="false" style="font-family:ui-monospace,monospace;font-size:12px;resize:vertical"></textarea>
+          <p class="dica">Use isto se o botão de download não funcionar no seu navegador: copie o texto e cole em um bloco de notas, salvando com a extensão certa.</p>
+        </div>
       </div>
       <p class="dica" id="statusDados"></p>
     </div>
@@ -1044,8 +1056,7 @@ function baixarArquivo(nome, conteudo, tipo){
   document.body.appendChild(a); a.click();
   setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 500);
 }
-function exportarCSV(){
-  if (!S.movs.length) return toast("Não há nada para exportar ainda.", "err");
+function montarCSV(){
   const cab = ["Data","Vencimento","Tipo","Situacao","Descricao","Paciente","Categoria","Forma de pagamento","Parcela","Plano","Valor"];
   const linhas = S.movs.slice().sort((a,b) => (a.venc||a.data) < (b.venc||b.data) ? -1 : 1).map(m => [
     ddmmaa(m.data), ddmmaa(m.venc || m.data),
@@ -1056,8 +1067,11 @@ function exportarCSV(){
     (Number(m.valor)||0).toFixed(2).replace(".", ",")
   ]);
   const q = v => `"${String(v).replace(/"/g, '""')}"`;
-  const csv = "﻿" + [cab, ...linhas].map(l => l.map(q).join(";")).join("\r\n");
-  baixarArquivo(`financeiro-${mesSel()}.csv`, csv, "text/csv;charset=utf-8");
+  return "﻿" + [cab, ...linhas].map(l => l.map(q).join(";")).join("\r\n");
+}
+function exportarCSV(){
+  if (!S.movs.length) return toast("Não há nada para exportar ainda.", "err");
+  baixarArquivo(`financeiro-${mesSel()}.csv`, montarCSV(), "text/csv;charset=utf-8");
   toast("CSV exportado. Abra no Excel ou Google Planilhas.", "ok");
 }
 function salvarBackup(){
@@ -1220,6 +1234,25 @@ function iniciar(){
     e.target.value = "";
   };
 
+  /* saída de emergência: dados em texto, para copiar */
+  const painel = () => $("painelCopia");
+  $("btnCopia").onclick = () => {
+    const aberto = painel().style.display !== "none";
+    painel().style.display = aberto ? "none" : "block";
+    $("btnCopia").textContent = aberto ? "📋 Mostrar dados para copiar" : "📋 Esconder";
+    if (!aberto) $("btnCopiaJson").click();
+  };
+  $("btnCopiaJson").onclick = () => {
+    $("txtCopia").value = JSON.stringify({ app:"dashboard-financeiro-nutri", versao:1, gerado_em:hojeStr(), dados:S }, null, 2);
+  };
+  $("btnCopiaCsv").onclick = () => { $("txtCopia").value = montarCSV(); };
+  $("btnCopiaTudo").onclick = async () => {
+    const t = $("txtCopia");
+    t.select(); t.setSelectionRange(0, 999999);
+    try { await navigator.clipboard.writeText(t.value); toast("Texto copiado.", "ok"); }
+    catch(e){ toast("Selecionei o texto — use Ctrl+C (ou toque e segure).", ""); }
+  };
+
   $("btnDemo").onclick   = e => confirmar(e.currentTarget, "substituir tudo?", carregarDemo);
   $("btnLimpar").onclick = e => confirmar(e.currentTarget, "apagar mesmo?", () => {
     S = estado_padrao(); preencherAjustes(); mudou(); toast("Tudo apagado. Começando do zero.");
@@ -1229,7 +1262,8 @@ function iniciar(){
   salvar();
 }
 
-document.addEventListener("DOMContentLoaded", iniciar);
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", iniciar);
+else iniciar();
 </script>
 </body>
 </html>
