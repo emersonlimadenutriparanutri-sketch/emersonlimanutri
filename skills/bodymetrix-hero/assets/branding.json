@@ -1,0 +1,28 @@
+{
+  "marca": "Emerson Lima Nutre",
+  "profissional": "Emerson Lima",
+  "registro": "CRN/1 - 19620/P",
+  "cores": {
+    "verde": "#3B5A2E",
+    "verde_claro": "#F1F5EC",
+    "verde_medio": "#7A9A65",
+    "texto": "#2B2B2B",
+    "texto_suave": "#6B6B6B",
+    "linha": "#D9DFD2",
+    "atencao": "#B8860B",
+    "fora": "#A33A3A",
+    "otimo": "#3B5A2E"
+  },
+  "fonte": {
+    "preferida": "DejaVuSans",
+    "caminhos": [
+      "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+      "/System/Library/Fonts/Supplemental/DejaVuSans.ttf",
+      "/Library/Fonts/DejaVuSans.ttf",
+      "C:/Windows/Fonts/DejaVuSans.ttf"
+    ],
+    "fallback": "Helvetica"
+  },
+  "logo": "assets/logo-emerson-lima-nutre.png",
+  "citacao_final": "A avaliacao corporal nao define quem voce e — ela mostra onde voce esta e para onde da para ir."
+}

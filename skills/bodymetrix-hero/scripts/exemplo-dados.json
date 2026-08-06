@@ -1,0 +1,106 @@
+{
+  "paciente": {
+    "nome": "Maria Fernanda Alves",
+    "sexo": "F",
+    "idade": 34,
+    "altura_cm": 165,
+    "peso_kg": 72.4,
+    "objetivo": "Reduzir gordura corporal preservando massa magra"
+  },
+  "protocolo": "auto",
+  "equacao": "siri",
+  "incluir_tabela_sitios": true,
+  "metas_percentual": [
+    26,
+    24
+  ],
+  "avaliacao_atual": {
+    "data": "05/08/2026",
+    "peso_kg": 72.4,
+    "percentual_software": 30.2,
+    "sitios": {
+      "triceps": 18.4,
+      "suprailiaca": 21.7,
+      "coxa": 26.3,
+      "abdominal": 24.1,
+      "peitoral": 11.2,
+      "axilar_media": 13.6,
+      "subescapular": 16.9
+    }
+  },
+  "avaliacoes_anteriores": [
+    {
+      "data": "02/05/2026",
+      "peso_kg": 75.1,
+      "sitios": {
+        "triceps": 20.1,
+        "suprailiaca": 24.9,
+        "coxa": 28.8,
+        "abdominal": 27.6,
+        "peitoral": 12.4,
+        "axilar_media": 15.1,
+        "subescapular": 18.3
+      }
+    }
+  ],
+  "relatorio_tecnico": {
+    "resumo": "Paciente de 34 anos, em acompanhamento ha tres meses, com objetivo de reducao de gordura corporal preservando massa magra. A avaliacao atual mostra reducao consistente do panorama adiposo, com queda concentrada nos pontos de tronco.",
+    "leitura_evolucao": "Reducao de 2,2 p.p. no percentual de gordura (28,0% para 25,8%) com queda de 2,3 kg de massa gorda e variacao de apenas -0,4 kg na massa magra. O desfecho e o desejado: a perda de peso veio de tecido adiposo, com preservacao substancial da massa magra.",
+    "secoes": [
+      {
+        "titulo": "Leitura clinica",
+        "itens": [
+          [
+            "texto",
+            "A distribuicao das espessuras mantem predominio em regiao gluteofemoral, padrao ginoide esperado para o sexo e a faixa etaria."
+          ],
+          [
+            "texto",
+            "A reducao proporcionalmente maior nos pontos de tronco sugere boa resposta a estrategia alimentar adotada no periodo."
+          ]
+        ]
+      },
+      {
+        "titulo": "Condutas e direcionamentos",
+        "itens": [
+          [
+            "bullet",
+            "Manter o aporte proteico em 1,6 g/kg de peso corporal, distribuido nas principais refeicoes."
+          ],
+          [
+            "bullet",
+            "Preservar o treino resistido em tres sessoes semanais — e o que sustenta a massa magra durante o deficit."
+          ],
+          [
+            "bullet",
+            "Reavaliar em 8 a 12 semanas, sempre no mesmo horario e nas mesmas condicoes de hidratacao."
+          ]
+        ]
+      }
+    ]
+  },
+  "relatorio_paciente": {
+    "abertura": "Essa avaliacao mede, com ultrassom, a espessura da camada de gordura em pontos especificos do seu corpo. Com esses valores conseguimos saber quanto do seu peso e gordura e quanto e massa magra — musculo, osso e agua. E uma leitura bem mais precisa do que so o numero da balanca.",
+    "evolucao": "Desde maio voce reduziu 2,7 kg na balanca, e o percentual de gordura caiu de 28,0% para 25,8%. O mais importante e de onde veio essa reducao: 2,3 kg dos 2,7 kg perdidos foram de gordura, e sua massa magra praticamente se manteve. Isso significa que o caminho esta certo.",
+    "secoes": [
+      {
+        "titulo": "O que fazer daqui pra frente",
+        "itens": [
+          [
+            "bullet",
+            "Continue com a proteina em todas as refeicoes — e ela que protege seu musculo."
+          ],
+          [
+            "bullet",
+            "Mantenha a musculacao tres vezes por semana."
+          ],
+          [
+            "bullet",
+            "A proxima avaliacao sera em cerca de 2 a 3 meses, no mesmo horario."
+          ]
+        ]
+      }
+    ]
+  },
+  "whatsapp": "Oi Maria! Sua avaliacao de hoje: 25,8% de gordura corporal (estava em 28,0% em maio). Voce perdeu 2,7 kg e 2,3 kg disso foi gordura — sua massa magra praticamente se manteve, que era exatamente o objetivo. Seguimos com a mesma estrategia. Te mando o relatorio completo em PDF."
+}
