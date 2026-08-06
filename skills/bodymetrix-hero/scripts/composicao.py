@@ -10,24 +10,29 @@ Referencias das equacoes: ver ../references/protocolos-e-calculos.md
 
 from __future__ import annotations
 
+import unicodedata
+
 # ---------------------------------------------------------------------------
 # Sitios anatomicos: chave canonica -> (rotulo PT-BR, sinonimos aceitos)
 # ---------------------------------------------------------------------------
 
 SITIOS = {
     "peitoral":     ("Peitoral",       ["chest", "pectoral", "peito", "torax"]),
-    "axilar_media": ("Axilar media",   ["midaxillary", "mid-axillary", "axilar", "axila"]),
-    "triceps":      ("Triceps",        ["tricep", "triceps braquial"]),
+    "axilar_media": ("Axilar média",   ["midaxillary", "mid-axillary", "axilar", "axila"]),
+    "triceps":      ("Tríceps",        ["tricep", "triceps braquial"]),
     "subescapular": ("Subescapular",   ["subscapular", "subescapula"]),
     "abdominal":    ("Abdominal",      ["abdomen", "abdominal", "abdome"]),
-    "suprailiaca":  ("Supra-iliaca",   ["suprailiac", "supra-iliac", "supra iliaca", "iliaca"]),
+    "suprailiaca":  ("Supra-ilíaca",   ["suprailiac", "supra-iliac", "supra iliaca", "iliaca"]),
     "coxa":         ("Coxa",           ["thigh", "coxa anterior", "quadriceps"]),
     # Sitios extras que o BodyMetrix costuma medir. Nao entram nas equacoes
     # JP, mas sao muito uteis para acompanhar evolucao regional.
-    "biceps":       ("Biceps",         ["bicep", "biceps braquial"]),
+    "biceps":       ("Bíceps",         ["bicep", "biceps braquial"]),
     "panturrilha":  ("Panturrilha",    ["calf", "gemeos"]),
     "lombar":       ("Lombar",         ["lower back", "lombo"]),
 }
+
+# Atalho para quem so precisa do rotulo de exibicao (o gerador de PDF usa este).
+SITIOS_ACENTUADOS = {chave: rotulo for chave, (rotulo, _) in SITIOS.items()}
 
 JP7 = ["peitoral", "axilar_media", "triceps", "subescapular",
        "abdominal", "suprailiaca", "coxa"]
@@ -35,16 +40,18 @@ JP3_HOMEM = ["peitoral", "abdominal", "coxa"]
 JP3_MULHER = ["triceps", "suprailiaca", "coxa"]
 
 
+def _sem_acento(texto: str) -> str:
+    texto = unicodedata.normalize("NFKD", texto or "")
+    texto = "".join(c for c in texto if not unicodedata.combining(c))
+    return texto.lower().replace("-", " ").replace("_", " ").strip()
+
+
 def normalizar_sitio(nome: str) -> str | None:
     """Converte um rotulo qualquer (PT ou EN, com/sem acento) na chave canonica."""
-    limpo = (nome or "").strip().lower()
-    for acentuado, simples in [("á", "a"), ("â", "a"), ("ã", "a"), ("é", "e"),
-                               ("ê", "e"), ("í", "i"), ("ó", "o"), ("ô", "o"),
-                               ("õ", "o"), ("ú", "u"), ("ç", "c")]:
-        limpo = limpo.replace(acentuado, simples)
-    limpo = limpo.replace("-", " ").replace("_", " ").strip()
+    limpo = _sem_acento(nome)
     for chave, (rotulo, sinonimos) in SITIOS.items():
-        candidatos = [chave.replace("_", " "), rotulo.lower()] + sinonimos
+        candidatos = {_sem_acento(chave), _sem_acento(rotulo)}
+        candidatos.update(_sem_acento(s) for s in sinonimos)
         if limpo in candidatos:
             return chave
     return None
@@ -87,8 +94,8 @@ _TABELA = {
 }
 
 _FAIXAS_ESPECIAIS = {
-    "M": [(5.0, "Abaixo da gordura essencial"), (13.0, "Atletico")],
-    "F": [(12.0, "Abaixo da gordura essencial"), (20.0, "Atletico")],
+    "M": [(5.0, "Abaixo da gordura essencial"), (13.0, "Atlético")],
+    "F": [(12.0, "Abaixo da gordura essencial"), (20.0, "Atlético")],
 }
 
 
@@ -108,22 +115,22 @@ def classificar_gordura(percentual: float, idade: float, sexo: str) -> dict:
     elif percentual <= bom:
         categoria, status = "Bom", "otimo"
     elif percentual <= med:
-        categoria, status = "Medio", "aceitavel"
+        categoria, status = "Médio", "aceitavel"
     elif percentual <= acima:
-        categoria, status = "Acima da media", "atencao"
+        categoria, status = "Acima da média", "atencao"
     else:
         categoria, status = "Elevado", "fora"
 
     if especial == "Abaixo da gordura essencial":
         categoria, status = "Abaixo da gordura essencial", "atencao"
-    elif especial == "Atletico" and status == "otimo":
-        categoria = "Atletico"
+    elif especial == "Atlético" and status == "otimo":
+        categoria = "Atlético"
 
     return {
         "categoria": categoria,
         "status": status,
-        "faixa_referencia": f"Excelente <={exc}% | Bom <={bom}% | Medio <={med}% "
-                            f"| Acima da media <={acima}% | Elevado >{acima}%",
+        "faixa_referencia": f"Excelente <={exc}% | Bom <={bom}% | Médio <={med}% "
+                            f"| Acima da média <={acima}% | Elevado >{acima}%",
     }
 
 
@@ -155,7 +162,7 @@ def calcular(paciente: dict, sitios: dict, protocolo: str = "auto",
     """
     sexo = (paciente.get("sexo") or "").strip().upper()[:1]
     if sexo not in ("M", "F"):
-        raise ValueError("sexo deve ser 'M' ou 'F' — as equacoes JP sao sexo-especificas")
+        raise ValueError("sexo deve ser 'M' ou 'F' — as equações JP são sexo-específicas")
     idade = float(paciente["idade"])
     peso = float(paciente["peso_kg"])
 
@@ -174,7 +181,7 @@ def calcular(paciente: dict, sitios: dict, protocolo: str = "auto",
         faltando = [SITIOS[s][0] for s in JP7 if s not in medidos]
         if tem_jp3:
             protocolo = "jp3"
-            avisos.append("JP7 pedido, mas faltaram os sitios: " + ", ".join(faltando)
+            avisos.append("JP7 pedido, mas faltaram os sítios: " + ", ".join(faltando)
                           + ". Usado JP3 (fallback).")
         else:
             protocolo = "insuficiente"
@@ -184,10 +191,10 @@ def calcular(paciente: dict, sitios: dict, protocolo: str = "auto",
     if protocolo == "insuficiente":
         faltando_jp3 = [SITIOS[s][0] for s in jp3_sitios if s not in medidos]
         raise ValueError(
-            "Sitios insuficientes para calcular %GC. Para JP3 ("
+            "Sítios insuficientes para calcular %GC. Para JP3 ("
             + ("homem" if sexo == "M" else "mulher") + ") faltam: "
             + ", ".join(faltando_jp3)
-            + ". Peca ao usuario os valores ou confirme se deve usar o %GC do software."
+            + ". Peça ao usuário os valores ou confirme se deve usar o %GC do software."
         )
 
     usados = JP7 if protocolo == "jp7" else jp3_sitios
@@ -198,8 +205,8 @@ def calcular(paciente: dict, sitios: dict, protocolo: str = "auto",
 
     if percentual <= 0 or percentual >= 70:
         raise ValueError(
-            f"%GC calculado ({percentual}%) esta fora do plausivel. "
-            "Confira se as espessuras estao em milimetros e se os sitios foram "
+            f"%GC calculado ({percentual}%) está fora do plausível. "
+            "Confira se as espessuras estão em milímetros e se os sítios foram "
             "mapeados corretamente."
         )
 
@@ -234,10 +241,14 @@ def calcular(paciente: dict, sitios: dict, protocolo: str = "auto",
         resultado["percentual_software"] = float(software)
         resultado["divergencia_software"] = divergencia
         if abs(divergencia) > 1.5:
+            def br(v, casas=1):
+                return f"{v:.{casas}f}".replace(".", ",")
             resultado["avisos"].append(
-                f"Divergencia de {divergencia:+.1f} p.p. em relacao ao %GC do software "
-                f"({software}%). Confira o protocolo configurado no BodyView e se todos "
-                f"os sitios foram lidos corretamente antes de usar o valor recalculado."
+                f"Divergência de {br(abs(divergencia))} p.p. "
+                f"{'para menos' if divergencia < 0 else 'para mais'} em relação ao %GC que "
+                f"o software calculou ({br(float(software))}%). Antes de usar o valor "
+                f"recalculado, confira o protocolo configurado no BodyView e se todos os "
+                f"sítios foram lidos corretamente."
             )
     return resultado
 

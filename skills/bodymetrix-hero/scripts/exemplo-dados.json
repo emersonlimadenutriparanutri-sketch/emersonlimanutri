@@ -11,8 +11,8 @@
   "equacao": "siri",
   "incluir_tabela_sitios": true,
   "metas_percentual": [
-    26,
-    24
+    24,
+    22
   ],
   "avaliacao_atual": {
     "data": "05/08/2026",
@@ -44,19 +44,19 @@
     }
   ],
   "relatorio_tecnico": {
-    "resumo": "Paciente de 34 anos, em acompanhamento ha tres meses, com objetivo de reducao de gordura corporal preservando massa magra. A avaliacao atual mostra reducao consistente do panorama adiposo, com queda concentrada nos pontos de tronco.",
-    "leitura_evolucao": "Reducao de 2,2 p.p. no percentual de gordura (28,0% para 25,8%) com queda de 2,3 kg de massa gorda e variacao de apenas -0,4 kg na massa magra. O desfecho e o desejado: a perda de peso veio de tecido adiposo, com preservacao substancial da massa magra.",
+    "resumo": "Paciente de 34 anos, em acompanhamento há três meses, com objetivo de redução de gordura corporal preservando massa magra. A avaliação atual mostra redução consistente do panorama adiposo, com queda concentrada nos pontos de tronco.",
+    "leitura_evolucao": "Redução de 2,2 p.p. no percentual de gordura (28,0% para 25,8%) com queda de 2,3 kg de massa gorda e variação de apenas -0,4 kg na massa magra. O desfecho é o desejado: a perda de peso veio de tecido adiposo, com preservação substancial da massa magra.",
     "secoes": [
       {
-        "titulo": "Leitura clinica",
+        "titulo": "Leitura clínica",
         "itens": [
           [
             "texto",
-            "A distribuicao das espessuras mantem predominio em regiao gluteofemoral, padrao ginoide esperado para o sexo e a faixa etaria."
+            "A distribuição das espessuras mantém predomínio em região gluteofemoral, padrão ginoide esperado para o sexo e a faixa etária."
           ],
           [
             "texto",
-            "A reducao proporcionalmente maior nos pontos de tronco sugere boa resposta a estrategia alimentar adotada no periodo."
+            "A redução proporcionalmente maior nos pontos de tronco sugere boa resposta à estratégia alimentar adotada no período."
           ]
         ]
       },
@@ -65,42 +65,42 @@
         "itens": [
           [
             "bullet",
-            "Manter o aporte proteico em 1,6 g/kg de peso corporal, distribuido nas principais refeicoes."
+            "Manter o aporte proteico em 1,6 g/kg de peso corporal, distribuído nas principais refeições."
           ],
           [
             "bullet",
-            "Preservar o treino resistido em tres sessoes semanais — e o que sustenta a massa magra durante o deficit."
+            "Preservar o treino resistido em três sessões semanais — é o que sustenta a massa magra durante o déficit."
           ],
           [
             "bullet",
-            "Reavaliar em 8 a 12 semanas, sempre no mesmo horario e nas mesmas condicoes de hidratacao."
+            "Reavaliar em 8 a 12 semanas, sempre no mesmo horário e nas mesmas condições de hidratação."
           ]
         ]
       }
     ]
   },
   "relatorio_paciente": {
-    "abertura": "Essa avaliacao mede, com ultrassom, a espessura da camada de gordura em pontos especificos do seu corpo. Com esses valores conseguimos saber quanto do seu peso e gordura e quanto e massa magra — musculo, osso e agua. E uma leitura bem mais precisa do que so o numero da balanca.",
-    "evolucao": "Desde maio voce reduziu 2,7 kg na balanca, e o percentual de gordura caiu de 28,0% para 25,8%. O mais importante e de onde veio essa reducao: 2,3 kg dos 2,7 kg perdidos foram de gordura, e sua massa magra praticamente se manteve. Isso significa que o caminho esta certo.",
+    "abertura": "Essa avaliação mede, com ultrassom, a espessura da camada de gordura em pontos específicos do seu corpo. Com esses valores conseguimos saber quanto do seu peso é gordura e quanto é massa magra — músculo, osso e água. É uma leitura bem mais precisa do que só o número da balança.",
+    "evolucao": "Desde maio você reduziu 2,7 kg na balança, e o percentual de gordura caiu de 28,0% para 25,8%. O mais importante é de onde veio essa redução: 2,3 kg dos 2,7 kg perdidos foram de gordura, e sua massa magra praticamente se manteve. Isso significa que o caminho está certo.",
     "secoes": [
       {
         "titulo": "O que fazer daqui pra frente",
         "itens": [
           [
             "bullet",
-            "Continue com a proteina em todas as refeicoes — e ela que protege seu musculo."
+            "Continue com a proteína em todas as refeições — é ela que protege seu músculo."
           ],
           [
             "bullet",
-            "Mantenha a musculacao tres vezes por semana."
+            "Mantenha a musculação três vezes por semana."
           ],
           [
             "bullet",
-            "A proxima avaliacao sera em cerca de 2 a 3 meses, no mesmo horario."
+            "A próxima avaliação será em cerca de 2 a 3 meses, no mesmo horário."
           ]
         ]
       }
     ]
   },
-  "whatsapp": "Oi Maria! Sua avaliacao de hoje: 25,8% de gordura corporal (estava em 28,0% em maio). Voce perdeu 2,7 kg e 2,3 kg disso foi gordura — sua massa magra praticamente se manteve, que era exatamente o objetivo. Seguimos com a mesma estrategia. Te mando o relatorio completo em PDF."
+  "whatsapp": "Oi Maria! Sua avaliação de hoje: 25,8% de gordura corporal (estava em 28,0% em maio). Você perdeu 2,7 kg e 2,3 kg disso foi gordura — sua massa magra praticamente se manteve, que era exatamente o objetivo. Seguimos com a mesma estratégia. Te mando o relatório completo em PDF."
 }
