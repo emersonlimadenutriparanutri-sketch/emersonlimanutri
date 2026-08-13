@@ -5,6 +5,7 @@
 **Canal:** WhatsApp (1 a 1 — copiar e colar).
 **Link:** https://emersonlimanutri-beep.github.io/piloto-automatico/
 **Regra da oferta:** convite primeiro, preço só na conversa. Nenhuma mensagem abaixo cita valor.
+**Bônus de fundador:** Manual de Criação de Foto Base no GPT — só para quem entrar nessa primeira turma.
 
 ---
 
@@ -49,6 +50,12 @@ Por isso eu estou chamando **primeiro quem já esteve na imersão**. Você já v
 
 ---
 
+E quem entrar como fundador leva um bônus que eu não vou repetir nas próximas turmas: o **Manual de Criação de Foto Base no GPT**.
+
+É o passo a passo pra você gerar sua foto base profissional dentro do GPT e usar ela em tudo — feed, capa de conteúdo, material de captação — sem depender de ensaio marcado, fotógrafo e aquele intervalo de meses entre uma foto e outra.
+
+---
+
 Dá uma olhada aqui pra entender o que é 👇
 https://emersonlimanutri-beep.github.io/piloto-automatico/
 
@@ -76,6 +83,10 @@ Na imersão você viu uma peça funcionando. A mentoria é o consultório inteir
 
 Fundador entra comigo enquanto o método ainda tá sendo lapidado, com acompanhamento de perto. Essa condição não se repete nas próximas turmas.
 
+E ainda leva de bônus o **Manual de Criação de Foto Base no GPT** — pra você gerar sua foto base profissional e usar em todo o seu conteúdo, sem ensaio marcado e sem fotógrafo. Esse bônus é só da turma de fundadores.
+
+---
+
 Aqui tá tudo explicado 👇
 https://emersonlimanutri-beep.github.io/piloto-automatico/
 
@@ -95,7 +106,7 @@ Você esteve na imersão de Claude comigo. Não sei se deu pra aplicar alguma co
 
 Foi por isso que eu montei a mentoria **Decola Nutri Piloto Automático**: em vez de te entregar mais uma ferramenta, montar com você o sistema que roda o consultório sozinho — captação, atendimento e bastidor.
 
-Tô abrindo a primeira turma com um **grupo pequeno de membros fundadores**, e chamando primeiro quem já esteve na imersão.
+Tô abrindo a primeira turma com um **grupo pequeno de membros fundadores**, e chamando primeiro quem já esteve na imersão. Quem entra como fundador ainda leva de bônus o **Manual de Criação de Foto Base no GPT** — sua foto base profissional feita por IA, pronta pra usar em todo o seu conteúdo.
 
 ---
 
@@ -118,7 +129,7 @@ Você se inscreveu na imersão de Claude e acabou não conseguindo assistir ao v
 
 Eu abri a mentoria **Decola Nutri Piloto Automático**: o consultório rodando no automático na captação, no atendimento e no bastidor, pra sua agenda parar de ser o gargalo de tudo.
 
-A primeira turma é um **grupo pequeno de membros fundadores**, e eu tô chamando primeiro quem estava na lista da imersão.
+A primeira turma é um **grupo pequeno de membros fundadores**, e eu tô chamando primeiro quem estava na lista da imersão. Fundador ainda leva de bônus o **Manual de Criação de Foto Base no GPT** — pra resolver suas fotos de conteúdo sem precisar marcar ensaio (que, convenhamos, é mais uma coisa que não cabe na sua agenda hoje).
 
 ---
 
@@ -141,6 +152,8 @@ Sei que minha mensagem pode ter caído num dia corrido — o seu e o meu.
 
 Só não queria que você perdesse por não ter visto: as vagas de **fundador** da Decola Nutri Piloto Automático são poucas e eu tô chamando primeiro quem esteve na imersão, antes de abrir pra lista toda.
 
+Fundador ainda leva o **Manual de Criação de Foto Base no GPT** de bônus — e esse bônus morre junto com a turma de fundadores.
+
 https://emersonlimanutri-beep.github.io/piloto-automatico/
 
 Um **"FUNDADOR"** aqui já basta que eu te explico. E um "agora não" também serve — assim eu paro de te incomodar 😄
@@ -155,7 +168,7 @@ Um **"FUNDADOR"** aqui já basta que eu te explico. E um "agora não" também se
 
 ---
 
-Vou fechar o grupo de fundadores da Decola Nutri Piloto Automático. Depois disso, quem entrar vai entrar na turma normal — sem o acompanhamento de perto que só a primeira turma vai ter.
+Vou fechar o grupo de fundadores da Decola Nutri Piloto Automático. Depois disso, quem entrar vai entrar na turma normal — sem o acompanhamento de perto e sem o **Manual de Criação de Foto Base no GPT**, que é bônus só de fundador.
 
 Se ficou aquela vontade de resolver isso de vez, é agora:
 https://emersonlimanutri-beep.github.io/piloto-automatico/
@@ -169,6 +182,7 @@ Se não for o seu momento, tá tudo certo — continuo aqui te acompanhando de p
 > "Oi [Nome], é o Emerson. Tô te mandando áudio porque é mais rápido do que escrever tudo isso.
 > Você esteve comigo na imersão de Claude. Lá eu te mostrei uma peça funcionando — mas eu saí de lá com uma coisa na cabeça: ferramenta solta não muda o mês de ninguém. O que muda é o sistema inteiro rodando.
 > Eu abri isso agora, chama Decola Nutri Piloto Automático, e a primeira turma vai ser um grupo bem pequeno de fundadores — gente que entra comigo enquanto eu ainda tô lapidando o método na prática.
+> Ah, e quem entra como fundador ainda leva um bônus meu: um manual de criação de foto base no GPT — pra você gerar sua foto profissional por IA e usar em todo o seu conteúdo, sem depender de ensaio nem de fotógrafo.
 > Tô chamando primeiro quem esteve na imersão, e você tá nessa lista. Te mandei o link aqui embaixo. Dá uma olhada e me responde, mesmo que for pra dizer que não é o momento. Um abraço!"
 
 ---
@@ -176,7 +190,7 @@ Se não for o seu momento, tá tudo certo — continuo aqui te acompanhando de p
 ## 8. Versão curta (status / lista de transmissão / direct)
 
 > Nutri, você que esteve na imersão de Claude comigo: eu abri a **Decola Nutri Piloto Automático** e a primeira turma é um grupo pequeno de **membros fundadores** — o consultório rodando no automático na captação, no atendimento e no bastidor.
-> Tô chamando quem esteve na imersão primeiro.
+> Tô chamando quem esteve na imersão primeiro — e fundador ainda leva de bônus o **Manual de Criação de Foto Base no GPT**.
 > https://emersonlimanutri-beep.github.io/piloto-automatico/
 > Me responde "FUNDADOR" que eu te explico.
 
@@ -211,6 +225,11 @@ Se não for o seu momento, tá tudo certo — continuo aqui te acompanhando de p
 > Entendo — e provavelmente não deu porque você tentou resolver a captação sem resolver o resto. Enche a agenda de lead e o atendimento trava; organiza o atendimento e o lead some.
 > Piloto Automático é justamente as três pontas juntas: captação, atendimento e bastidor. Uma sozinha não para em pé.
 
+**"O que é esse manual de foto base no GPT?"**
+
+> É o passo a passo que eu uso pra gerar uma foto base profissional dentro do GPT — sua imagem, seu rosto, do seu jeito — e reaproveitar ela em capa de conteúdo, feed, material de captação, apresentação de plano.
+> Resolve aquele problema chato de sempre: você precisa postar, mas as fotos que você tem são as mesmas de seis meses atrás. É bônus só de fundador, não vai pras próximas turmas.
+
 **"Vou pensar."**
 
 > Claro, pensa com calma. Só me responde uma coisa pra eu não te cobrar à toa: o que exatamente você quer pensar melhor — se é a hora, se é o investimento, ou se isso funciona pro seu tipo de paciente?
@@ -221,6 +240,7 @@ Se não for o seu momento, tá tudo certo — continuo aqui te acompanhando de p
 ## 10. Checklist antes de disparar
 
 - [ ] Link testado, abrindo no celular (não só no computador)
+- [ ] **Manual de Criação de Foto Base no GPT pronto pra entregar** (PDF ou link) — o bônus está prometido em todas as mensagens
 - [ ] Lista dos participantes da imersão separada em 3 grupos: ativos (A), quietos (B), ausentes (C)
 - [ ] Nome de cada pessoa conferido — nome errado queima a mensagem inteira
 - [ ] `[gancho pessoal]` preenchido no grupo A
