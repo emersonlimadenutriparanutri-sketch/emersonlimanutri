@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "openwa": {
+      "type": "http",
+      "url": "http://localhost:2785/mcp",
+      "headers": {
+        "Authorization": "Bearer COLE_AQUI_A_CHAVE_REAL"
+      }
+    }
+  }
+}
