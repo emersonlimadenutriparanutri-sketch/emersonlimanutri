@@ -43,11 +43,12 @@ Feita a consulta, o nutricionista libera as abas:
 
 | Aba | O que o paciente vê | Vem de |
 |---|---|---|
-| **Plano alimentar** | o plano entregue na consulta | liberação manual |
+| **Plano alimentar** | PDF do plano, aberto no app | upload manual (§6.8) |
 | **Resumos** | resumo da consulta e das avaliações | `resumos_consulta`, `relatorios_evolucao` |
 | **Check-ins** | "novo check-in disponível" quando abre a janela | tarefas `envio-raio-x` da jornada |
 | **Feedback** | o retorno do nutricionista sobre o check-in da semana | resumo escrito pelo nutri |
 | **Materiais** | o que foi disponibilizado na jornada | tarefas `envio-material` |
+| **Ciclo** | fase do ciclo e orientação nutricional da semana | §6.9 — só para quem tem ciclo ativo |
 | **Receitas** | busca em uma biblioteca de preparos | tabela nova (§6.5) |
 | **Tira-dúvidas** | IA respondendo dentro do escopo do plano dele | §10 |
 
@@ -100,12 +101,14 @@ Mais do que parece. O modelo de dados já antecipou boa parte do fluxo:
 | Tarefas de check-in e material na jornada | **Pronto** — `monthTasks[]` com `tipo`, `modeloQuestionario`, `documentos[]`, `links[]` |
 | Exames por paciente | **Pronto** — `analise_exames` |
 | Resumo de consulta e evolução | **Pronto** — `resumos_consulta`, `relatorios_evolucao` |
+| Configuração de ciclo menstrual | **Meio caminho** — `jornada.data.cicloMenstrual` já tem `ativo`, `duracaoCiclo`, `duracaoTPM`, `duracaoMenstruacao`, `ultimaMenstruacao`. Falta o histórico (§6.9) |
 | Canal de convite | **Escrito, não mesclado** — Edge Functions de WhatsApp na branch `whatsapp-api-integration` |
 | Questionário de rastreamento metabólico | **Falta** — criar `tipo = 'rastreamento'` e o modelo |
 | Anexo de exame **pelo paciente** | **Falta** |
 | Feedback do check-in como entidade | **Falta** |
 | Biblioteca de receitas culinárias | **Falta** — e atenção ao nome (§6.5) |
-| Plano alimentar como documento liberável | **Falta** — confirmar onde o plano vive hoje |
+| Plano alimentar | **Falta** — vive hoje em app externo de prescrição; entra como PDF (§6.8) |
+| Registro e fases do ciclo | **Falta** — histórico, cálculo de fase e orientações (§6.9) |
 
 O trabalho real não é criar dado novo. É **abrir uma porta de acesso sem abrir
 junto o que não deve ser visto** — e, como isso vira produto vendido, essa porta
@@ -396,6 +399,107 @@ gráfico e relatório, e arrisca sobrescrever avaliação do nutricionista. Tabe
 `paciente_medidas` separada, com peso, circunferências, fotos e observação; nos
 gráficos as duas séries aparecem juntas mas distinguíveis.
 
+### 6.8 Plano alimentar — por PDF, por enquanto
+
+O plano é prescrito hoje em app externo, e o app do nutricionista ainda não tem
+aba de plano alimentar. A solução provisória é a certa: **o nutricionista sobe o
+PDF, o paciente abre no app.** Sem integração, sem parser.
+
+```sql
+create table public.planos_alimentares (
+  id           uuid primary key default gen_random_uuid(),
+  user_id      uuid not null,
+  patient_id   uuid not null references public.patients(id) on delete cascade,
+  versao       int  not null default 1,
+  titulo       text,
+  storage_path text not null,        -- bucket privado
+  vigente_de   date,
+  publicado_em timestamptz,          -- null = rascunho, invisível ao paciente
+  created_at   timestamptz not null default now()
+);
+```
+
+Duas decisões que valem a pena mesmo na versão provisória:
+
+- **Versionar em vez de sobrescrever.** O plano muda a cada mês. Guardar as
+  versões custa quase nada e evita a pergunta "qual plano eu estava seguindo em
+  maio?" — que aparece sempre.
+- **Só a versão vigente aparece em destaque**, com as anteriores num histórico.
+  Paciente vendo dois PDFs sem saber qual vale é pior do que não ter a aba.
+
+Quando o plano passar a ser montado dentro do seu app, essa tabela vira o
+registro do documento gerado, e a aba do paciente não muda. É por isso que a
+solução provisória não vira dívida: o formato de entrega continua o mesmo.
+
+> A confirmar: o nome do app externo de prescrição, para o caso de ele ter API
+> de exportação — isso mudaria "subir PDF na mão" para "puxar automático" mais
+> adiante.
+
+### 6.9 Ciclo menstrual
+
+Uma aba onde a paciente registra cada menstruação, vê em que fase está e recebe a
+orientação nutricional daquela fase. É o tipo de coisa que os apps de ciclo já
+fazem — a diferença aqui é que a orientação vem do nutricionista dela.
+
+**O que já existe:** `jornada.data.cicloMenstrual`, com `ativo`, `duracaoCiclo`,
+`duracaoTPM`, `duracaoMenstruacao` e `ultimaMenstruacao`. É **configuração**, não
+histórico: um único campo que é sobrescrito. Para calcular fase com alguma
+honestidade, é preciso o log.
+
+```sql
+-- Uma linha por menstruação. A paciente marca quando vem.
+create table public.paciente_ciclo_registros (
+  id          uuid primary key default gen_random_uuid(),
+  patient_id  uuid not null references public.patients(id) on delete cascade,
+  inicio      date not null,
+  fim         date,
+  fluxo       text,          -- leve · moderado · intenso
+  sintomas    text[],        -- cólica, TPM, dor de cabeça…
+  observacao  text,
+  created_at  timestamptz not null default now(),
+  unique (patient_id, inicio)
+);
+
+-- Conteúdo por fase, escrito pelo nutricionista (ou padrão da plataforma).
+create table public.orientacoes_ciclo (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid,           -- null = conteúdo padrão da plataforma
+  fase       text not null,  -- menstrual · folicular · ovulatoria · lutea
+  titulo     text not null,
+  conteudo   text not null,
+  ativo      boolean not null default true
+);
+```
+
+**Quem é a fonte da verdade.** `paciente_ciclo_registros` passa a ser — a data da
+última menstruação é derivada do registro mais recente, não digitada em dois
+lugares. O campo `ultimaMenstruacao` do JSONB vira leitura derivada (ou é
+aposentado), senão o app do nutricionista e o da paciente vão discordar em duas
+semanas.
+
+**A fase é estimativa, e o app precisa dizer isso.** O cálculo parte do último
+início e da duração média dos ciclos registrados. Ciclo irregular quebra a
+previsão — e irregularidade não é exceção nessa população: numa anamnese real do
+seu banco, a resposta era *"Irregular, com cólicas intensas"*. Com menos de três
+ciclos registrados, ou com desvio alto entre eles, a tela deve mostrar a fase
+como aproximação e não exibir previsão de data. Errar com confiança é pior do que
+dizer "ainda não dá para estimar".
+
+**Isto não é método contraceptivo.** Aviso explícito na aba, uma linha, sem
+rodeio. Aplicativo que mostra janela fértil acaba sendo usado como
+anticoncepcional por alguém, e o app precisa ser claro que não serve para isso.
+
+**Quem vê.** O ciclo é clinicamente relevante — a anamnese já pergunta sobre ele,
+e a jornada já prevê o ajuste por fase. O nutricionista vê o histórico, e a
+paciente precisa saber disso no momento em que ativa a aba. Registro de
+menstruação é dado sensível mesmo dentro do que já é dado de saúde: guardar o
+mínimo, bucket e tabela privados, e a paciente podendo apagar os próprios
+registros.
+
+**Quando a aba aparece.** Só com `cicloMenstrual.ativo = true`. A chave é do
+nutricionista, e a paciente pode desativar do lado dela — sem virar uma aba que
+aparece para todo mundo por padrão.
+
 ---
 
 ## 7. Convite por WhatsApp
@@ -476,8 +580,9 @@ $$;
 | `questionario_envios` | ler os próprios envios |
 | `questionario_respostas` | inserir, se o envio é dele, no prazo e não respondido |
 | `paciente_exames`, `paciente_medidas`, `jornada_task_checkins` | CRUD nas próprias linhas |
-| `checkin_feedbacks` | ler apenas onde `publicado_em is not null` |
-| `receitas_culinarias` | ler as do nutri dele |
+| `paciente_ciclo_registros` | CRUD nas próprias linhas — inclusive apagar |
+| `checkin_feedbacks`, `planos_alimentares` | ler apenas onde `publicado_em is not null` |
+| `orientacoes_ciclo`, `receitas_culinarias` | ler as do nutri dele, mais as padrão da plataforma |
 | financeiro, `leads`, `kanban_*`, `funis_*`, `mind_maps` | **nenhum acesso** |
 
 Três pontos de atenção:
@@ -534,10 +639,11 @@ Isso é fase tardia. Nada aqui bloqueia o lançamento.
 | **2** | **Pré-consulta**: login, PWA, anamnese pelo app, anexo de exames, rascunho revisável | 1 |
 | **3** | Rastreamento metabólico: criar o tipo, o modelo e a tela | 2 |
 | **4** | **Ciclo semanal**: aba Check-ins, resposta, feedback publicável | 2 |
-| **5** | Entregas: plano alimentar, resumos, materiais | 2 |
-| **6** | Receitas (biblioteca com busca) | 5 |
-| **7** | Abertura para assinantes: branding, onboarding, modelos padrão, suporte | 4 |
-| **8** | IA: tira-dúvidas e composição de receitas | 6, 7 |
+| **5** | Entregas: plano alimentar em PDF versionado, resumos, materiais | 2 |
+| **6** | Ciclo menstrual: registro, cálculo de fase, orientações | 2 |
+| **7** | Receitas (biblioteca com busca) | 5 |
+| **8** | Abertura para assinantes: branding, onboarding, modelos padrão, suporte | 4 |
+| **9** | IA: tira-dúvidas e composição de receitas | 7, 8 |
 
 A ordem segue a sua: **a fase 2 já entrega valor sozinha.** Anamnese preenchida
 pelo paciente antes da consulta economiza tempo em toda primeira consulta, mesmo
@@ -557,13 +663,19 @@ dela por inteiro.
 ## 11. Sobre o tamanho disto
 
 O escopo cresceu bastante em relação ao MVP inicial: eram quatro blocos, agora
-são nove abas, mais IA. Vale dizer com todas as letras que **isso é um produto,
+são dez abas, mais IA. Vale dizer com todas as letras que **isso é um produto,
 não uma tela a mais** — e que o caminho seguro é entregar a metade 1
 (pré-consulta) completa e em produção antes de abrir a metade 2.
 
 Se em algum momento for preciso cortar, a ordem de corte que menos machuca é:
-IA → receitas → materiais → rastreamento. Anamnese, check-in e feedback são o
-esqueleto; o resto é músculo.
+IA → receitas → ciclo → materiais → rastreamento. Anamnese, check-in e feedback
+são o esqueleto; o resto é músculo.
+
+O ciclo é o caso mais interessante dessa lista: é a aba de maior valor percebido
+por paciente mulher — é o único item que ela abriria mesmo sem você pedir — e ao
+mesmo tempo é a que mais exige cuidado de comunicação, porque previsão errada
+com cara de certeza queima confiança rápido. Vale construir, mas não como aba
+apressada.
 
 ---
 
@@ -591,13 +703,16 @@ contratual, não técnica.
 
 1. **De qual número sai o WhatsApp** — modelo A ou B (§7). Maior impacto no
    cronograma.
-2. **Onde vive o plano alimentar hoje?** É PDF anexado, texto no app, ou fica em
-   app de prescrição externo? Isso define a aba mais visível do produto.
-3. Onde vive a informação de assinatura, para o gate da §4? Stripe, Kiwify,
+2. **Nome do app externo de prescrição**, para verificar se ele tem API de
+   exportação — mudaria "subir PDF na mão" para "puxar automático" mais adiante.
+3. **Quem escreve as orientações por fase do ciclo?** Você escreve as suas, ou a
+   plataforma entra com um conjunto padrão que o assinante edita? A segunda
+   opção é o que faz a aba não nascer vazia para quem assina.
+4. Onde vive a informação de assinatura, para o gate da §4? Stripe, Kiwify,
    Hotmart, outro?
-4. Confirmar se `receitas` é mesmo financeira (§6.5).
-5. Colunas de `raio_x_semanal`, hoje vazia: reaproveitar ou criar nova?
-6. Existe trigger de criação automática em `profiles` no signup?
-7. Confirmar no painel se `avaliacoes-fotos` é bucket público.
-8. A integração de WhatsApp da branch já foi aplicada em produção?
-9. Domínio do app do paciente.
+5. Confirmar se `receitas` é mesmo financeira (§6.5).
+6. Colunas de `raio_x_semanal`, hoje vazia: reaproveitar ou criar nova?
+7. Existe trigger de criação automática em `profiles` no signup?
+8. Confirmar no painel se `avaliacoes-fotos` é bucket público.
+9. A integração de WhatsApp da branch já foi aplicada em produção?
+10. Domínio do app do paciente.
