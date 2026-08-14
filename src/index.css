@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-areia-50 text-marca-900 antialiased;
+    font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+
+  /* Espaço para a barra inferior e para a área segura do iPhone. */
+  .pb-nav {
+    padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+  }
+}
+
+@layer components {
+  .cartao {
+    @apply rounded-2xl bg-white p-4 shadow-sm ring-1 ring-marca-100;
+  }
+
+  .rotulo {
+    @apply mb-1.5 block text-sm font-medium text-marca-800;
+  }
+
+  .campo {
+    @apply w-full rounded-xl border border-marca-200 bg-white px-3.5 py-3 text-base
+           text-marca-900 outline-none transition placeholder:text-marca-300
+           focus:border-marca-500 focus:ring-2 focus:ring-marca-200 disabled:opacity-60;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-base
+           font-semibold transition active:scale-[0.99] disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-primario {
+    @apply btn bg-marca-700 text-white hover:bg-marca-800;
+  }
+
+  .btn-secundario {
+    @apply btn bg-marca-50 text-marca-800 ring-1 ring-marca-200 hover:bg-marca-100;
+  }
+
+  .btn-texto {
+    @apply btn bg-transparent px-2 py-1.5 text-sm text-marca-700 hover:text-marca-900;
+  }
+
+  .selo {
+    @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium;
+  }
+}
