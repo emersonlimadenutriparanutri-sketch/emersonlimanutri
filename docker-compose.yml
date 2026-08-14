@@ -1,0 +1,21 @@
+services:
+  openwa:
+    build: .
+    image: openwa-service:latest
+    container_name: openwa
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      # Por padrao so escuta em 127.0.0.1: exponha para a internet via Nginx/Caddy
+      # com HTTPS, nunca com a porta crua aberta.
+      - "127.0.0.1:${HOST_PORT:-3000}:${PORT:-3000}"
+    volumes:
+      # Sessao do WhatsApp. Perder este volume = ter que ler o QR de novo.
+      - ./data:/app/data
+    # O Chromium quebra com o /dev/shm padrao de 64 MB do Docker.
+    shm_size: "1gb"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"

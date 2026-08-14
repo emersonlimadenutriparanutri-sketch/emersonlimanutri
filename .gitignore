@@ -1,0 +1,14 @@
+node_modules/
+data/
+*.data.json
+.env
+.env.*
+!.env.example
+npm-debug.log*
+.DS_Store
+
+# managed by open-wa
+**.data.json
+**.node-persist**
+**_IGNORE_**
+# end managed by open-wa
