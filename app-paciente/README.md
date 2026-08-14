@@ -2,134 +2,104 @@
 
 Primeira etapa do [plano técnico](../docs/app-paciente/plano-tecnico.md).
 
-A fase 0 não constrói nada do app do paciente. Ela fecha as duas portas que
-precisam estar fechadas **antes** de qualquer paciente virar usuário
-autenticado — e as duas já valem a pena hoje, mesmo que o app nunca seja
-construído.
+A fase 0 não constrói nada do app do paciente. Ela fecha as portas que precisam
+estar fechadas **antes** de qualquer paciente virar usuário autenticado — e as
+duas já valiam a pena hoje, mesmo que o app nunca fosse construído.
 
-Começamos por aqui porque é a única etapa que não depende de nenhuma decisão em
-aberto: modelo de WhatsApp, gate de assinatura e conteúdo do ciclo não bloqueiam
-nada disto.
-
-| Etapa | O quê | Onde |
+| Etapa | O quê | Situação |
 |---|---|---|
-| **0.1** | Isolar `profiles` entre contas | `sql/001_profiles_rls.sql` + `sql/002_verificacao.sql` |
-| **0.2** | Tornar privado o bucket `avaliacoes-fotos` | procedimento abaixo |
+| **0.1** | Isolar `profiles` entre contas | **Aplicada.** Falta rodar `sql/003_limpeza_profiles.sql` |
+| **0.2** | Bucket de fotos e laudos privado | **Já estava resolvida** — ver abaixo |
 
 ---
 
 ## 0.1 — Isolar `profiles`
 
-Hoje qualquer usuário autenticado lê a tabela `profiles` inteira: nome, e-mail e
+Qualquer usuário autenticado lia a tabela `profiles` inteira: nome, e-mail e
 telefone de **148 nutricionistas**. Com pacientes virando usuários autenticados,
-cada um deles passaria a ler a sua base de clientes.
+cada um deles passaria a ler a base de clientes da plataforma.
 
-**Como aplicar — não há nada para editar.** Os arquivos já vêm com os UUIDs
-reais preenchidos.
+### Arquivos
 
-1. Abra o SQL Editor:
-   <https://supabase.com/dashboard/project/fhhtewujnevpcatbiuoc/sql/new>
-2. Cole `sql/001_profiles_rls.sql` inteiro e execute. No fim ele lista as
-   policies resultantes — devem ser exatamente três: `profiles_select_own`,
-   `profiles_update_own` e `profiles_insert_own`.
-3. Numa aba nova, cole `sql/002_verificacao.sql` e execute. Os quatro testes
-   devem dar `1`, `148`, `0` e `0`.
-4. Entre no seu app como nutricionista e navegue pelas telas principais.
+| | |
+|---|---|
+| `sql/001_profiles_rls.sql` | a migration — **aplicada** |
+| `sql/002_verificacao.sql` | prova de isolamento — **pendente**, precisa do SQL Editor |
+| `sql/003_limpeza_profiles.sql` | remove policies redundantes — **pendente** |
+| `PROMPT-LOVABLE.md` | texto pronto para aplicar sem acesso ao painel |
 
-A verificação é arquivo separado de propósito: ela usa blocos
-`begin … rollback`, que alguns editores não gostam de executar junto com DDL. Se
-algum bloco reclamar, rode um teste por vez — são independentes e nenhum altera
-dado.
+O projeto Supabase foi criado pela Lovable e o painel não está acessível pela
+conta atual, então a 001 foi aplicada pedindo à Lovable. Enquanto o acesso ao
+painel não for resolvido, cada migration precisa desse caminho.
 
-**Por que o teste não é um `select count(*)`.** O SQL Editor roda como
-superusuário e ignora RLS. Uma contagem normal devolveria as 148 linhas mesmo
-com as policies perfeitas — passaria sem provar nada. Os testes trocam o papel
-para `authenticated` e forjam as claims de JWT, que é como o Postgres enxerga um
-usuário real vindo do app.
+### Estado depois da 001
 
-**O que pode quebrar.** Se alguma tela do app hoje lê `profiles` de outras
-contas, ela para de funcionar. O caso mais provável é uma tela sua de
-administração listando assinantes — por isso a migration cria a allowlist
-`platform_admins` e já cadastra você nela antes de trancar a tabela.
+Três policies novas em `profiles`, e as duas antigas de INSERT/UPDATE
+sobreviveram — a 001 só removia policies de SELECT. Foram conferidas: são
+duplicatas exatas das novas, não deixam nenhum buraco aberto. A `003` remove.
 
-O rollback está na seção 4 do `001`, mas ele reabre o vazamento — serve para
-destravar enquanto você investiga, não como solução.
+Confirmado por leitura como o nutricionista autenticado: `profiles` devolve as
+148 linhas (caminho de admin OK) enquanto `patients` devolve só os pacientes
+dele — o que prova que a RLS está ativa de verdade, e não que a conexão está
+passando como `service_role`.
 
-> A view `v_nutri_publico`, que deixa o paciente ver o nome e o CRN do
-> nutricionista dele, fica para a fase 1: ela depende da tabela
-> `patient_users`, que ainda não existe.
+Telas Admin e Perfil testadas no app, funcionando.
+
+### O que ainda falta provar
+
+A `002` prova o que a 001 não prova sozinha: que um nutricionista **comum** vê
+só a própria linha. Ela usa `begin … rollback` com troca de papel, que o
+executor de migration da Lovable não aceita — precisa do SQL Editor.
+
+Não é formalidade. Um `select count(*)` no painel roda como superusuário e
+ignora RLS: devolveria as 148 linhas mesmo com as policies erradas. A 002 troca
+o papel para `authenticated` e forja as claims de JWT, que é como o Postgres
+enxerga um usuário real vindo do app.
+
+### `service_role` — verificado
+
+Nenhuma ocorrência em `src/`. A chave só é lida via `Deno.env.get` dentro de
+Edge Functions, e o `.env` do frontend tem apenas `VITE_SUPABASE_PUBLISHABLE_KEY`.
+
+Isso importava mais que todo o resto: chave de serviço num bundle de navegador
+ignora RLS e é legível por qualquer pessoa no DevTools — tornaria todas as
+policies decorativas.
 
 ---
 
-## 0.2 — Bucket privado
+## 0.2 — Storage
 
-Os anexos de avaliação hoje apontam para URLs como:
+**Já estava resolvida.** `avaliacoes-fotos` está privado (`public = false`).
 
-```
-https://<projeto>.supabase.co/storage/v1/object/public/avaliacoes-fotos/...
-```
+Os buckets públicos do projeto são `avatares`, `coberturas-de-curso` e
+`materiais-de-aula` — nenhum deles guarda dado clínico de paciente.
 
-O `/public/` significa bucket público: qualquer pessoa com o link abre o
-arquivo, sem autenticação. São fotos corporais e laudos — dado de saúde, que a
-LGPD trata como sensível.
+### Duas coisas para verificar mesmo assim
 
-### A ordem importa
+**1. As URLs antigas ainda abrem?** O banco guarda URLs no formato
+`/storage/v1/object/public/avaliacoes-fotos/…` em `avaliacoes_fisicas.anexos_pdf`
+e nos campos de foto. Com o bucket privado, esse formato de URL não funciona —
+então ou o app já gera URL assinada na hora de exibir, ou os anexos antigos
+estão quebrados sem ninguém ter notado.
 
-**Não vire a chave do bucket primeiro.** Se o bucket virar privado antes de o
-app saber gerar URL assinada, toda foto e todo PDF já cadastrado param de abrir
-na hora — para você e para todos os assinantes.
+Teste rápido: abrir um paciente com PDF anexado e ver se o arquivo abre.
 
-A sequência segura é o inverso:
+**2. Os buckets do app do paciente nascem privados.** `paciente-uploads`,
+`paciente-exames` e `planos-alimentares` entram na fase 1 com policy de storage
+casando o prefixo do path com o paciente dono.
 
-1. **Confirmar** no painel (Storage → `avaliacoes-fotos` → Settings) se o bucket
-   está mesmo marcado como público. O padrão da URL indica que sim, mas confirme.
-
-2. **Ajustar o app primeiro**, ainda com o bucket público. Onde hoje ele usa a
-   URL salva direto, passa a gerar uma URL assinada na hora de exibir:
-
-   ```js
-   const { data } = await supabase
-     .storage.from('avaliacoes-fotos')
-     .createSignedUrl(path, 60 * 10)   // 10 minutos
-   ```
-
-   Detalhe que vai aparecer: o banco guarda a **URL pública completa** em
-   `avaliacoes_fisicas.anexos_pdf[].url` e nos campos `foto_frente`, `foto_lado`
-   e `foto_costas` — não o path. Para assinar é preciso o path relativo ao
-   bucket, que sai da própria URL, cortando tudo até
-   `/public/avaliacoes-fotos/`. Vale encapsular isso numa função só, porque o
-   mesmo tratamento serve para os buckets novos do app do paciente.
-
-3. **Testar** com o bucket ainda público: se as telas continuam funcionando com
-   URL assinada, o passo seguinte é seguro.
-
-4. **Virar o bucket para privado** no painel.
-
-5. **Verificar** abrindo uma URL pública antiga numa janela anônima — deve dar
-   erro. Se ainda abrir, o bucket não virou.
-
-### Bucket novo, já privado
-
-Os buckets do app do paciente (`paciente-uploads`, `paciente-exames`,
-`planos-alimentares`) nascem privados, com policy de storage casando o prefixo
-do path com o paciente dono. Isso entra na fase 1, junto com `is_patient_of()`.
+Atenção especial na aba **Materiais**: é tentador reaproveitar
+`materiais-de-aula`, que já existe — mas ele é **público**. Material dirigido a
+um paciente específico não pode morar lá. Ou vai para bucket privado próprio, ou
+`materiais-de-aula` fica restrito ao que é conteúdo aberto de curso.
 
 ---
 
 ## O que a fase 0 deliberadamente não faz
 
-- **Teste automatizado da matriz de RLS.** Ele precisa autenticar como paciente
-  de teste, e `patient_users` só existe na fase 1. O esqueleto entra junto com
-  ela.
-- **Qualquer separação dos JSONBs.** `jornada.data` e `anamnese.data` continuam
+- **Teste automatizado da matriz de RLS.** Precisa autenticar como paciente de
+  teste, e `patient_users` só existe na fase 1.
+- **Separação dos JSONBs.** `jornada.data` e `anamnese.data` continuam
   misturando dado do paciente com anotação interna — o que não é problema
-  enquanto ninguém além do nutricionista lê essas tabelas. Vira problema na fase
-  2, e é lá que as views entram.
-
----
-
-## Ordem de execução
-
-0.1 e 0.2 são independentes. 0.1 é mais rápida e reversível; 0.2 mexe em código
-do app e pede uma janela com calma. Sugestão: 0.1 primeiro, confirmar que o app
-está de pé, e só então começar 0.2.
+  enquanto ninguém além do nutricionista lê essas tabelas. Vira problema na
+  fase 2, e é lá que as views entram.

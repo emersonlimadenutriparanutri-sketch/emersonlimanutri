@@ -101,6 +101,10 @@ Mais do que parece. O modelo de dados já antecipou boa parte do fluxo:
 | Tarefas de check-in e material na jornada | **Pronto** — `monthTasks[]` com `tipo`, `modeloQuestionario`, `documentos[]`, `links[]` |
 | Exames por paciente | **Pronto** — `analise_exames` |
 | Resumo de consulta e evolução | **Pronto** — `resumos_consulta`, `relatorios_evolucao` |
+| Endpoint público de questionário | **Pronto** — Edge Function `questionario-publico`, que é o caminho tokenizado que o app substitui por card interno |
+| Leitura de exame em PDF por IA | **Pronto** — `exames-pdf-ia` |
+| Anamnese por IA | **Pronto** — `anamnese-externa-ia` |
+| Base para o tira-dúvidas | **Meio caminho** — já existe `agente-ia-chat`; falta o escopo fechado por paciente (§10) |
 | Configuração de ciclo menstrual | **Meio caminho** — `jornada.data.cicloMenstrual` já tem `ativo`, `duracaoCiclo`, `duracaoTPM`, `duracaoMenstruacao`, `ultimaMenstruacao`. Falta o histórico (§6.9) |
 | Canal de convite | **Escrito, não mesclado** — Edge Functions de WhatsApp na branch `whatsapp-api-integration` |
 | Questionário de rastreamento metabólico | **Falta** — criar `tipo = 'rastreamento'` e o modelo |
@@ -708,8 +712,9 @@ contratual, não técnica.
 3. **Quem escreve as orientações por fase do ciclo?** Você escreve as suas, ou a
    plataforma entra com um conjunto padrão que o assinante edita? A segunda
    opção é o que faz a aba não nascer vazia para quem assina.
-4. Onde vive a informação de assinatura, para o gate da §4? Stripe, Kiwify,
-   Hotmart, outro?
+4. **Assinatura: é Hotmart.** Existe uma Edge Function `hotmart-webhook`, então
+   o gate da §4 provavelmente sai do que ela grava. Falta confirmar em qual
+   tabela, e se há um campo de plano ou só de status de pagamento.
 5. Confirmar se `receitas` é mesmo financeira (§6.5).
 6. Colunas de `raio_x_semanal`, hoje vazia: reaproveitar ou criar nova?
 7. Existe trigger de criação automática em `profiles` no signup?
