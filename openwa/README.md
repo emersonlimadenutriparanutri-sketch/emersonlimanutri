@@ -3,11 +3,12 @@
 Arquivos prontos para subir o [OpenWA](https://github.com/rmyndharis/OpenWA) com o
 servidor MCP habilitado e conectar o Claude nele.
 
-> **Por que isso está aqui e não rodando:** a tentativa de subir o stack neste
-> ambiente falhou porque `production.cloudfront.docker.com` — o CDN de onde o
-> Docker Hub serve todas as camadas de imagem — está bloqueado pela política de
-> rede. Nenhum container chegou a ser criado. Estes arquivos são para você rodar
-> numa máquina com acesso normal ao Docker Hub (seu computador, VPS ou servidor).
+> **Por que isso está aqui e não rodando:** a tentativa de subir o stack numa
+> sessão do Claude Code na nuvem falhou porque `production.cloudfront.docker.com`
+> — o CDN de onde o Docker Hub serve as camadas de imagem — está fora da lista de
+> domínios permitidos do ambiente. Nenhum container chegou a ser criado. Veja
+> [Liberar o Docker Hub](#liberar-o-docker-hub-no-ambiente-da-nuvem) para o ajuste,
+> ou rode numa máquina com acesso normal ao Docker Hub.
 
 ## Conteúdo
 
@@ -15,6 +16,46 @@ servidor MCP habilitado e conectar o Claude nele.
 | ------------------- | --------------------------------------------------- |
 | `env.exemplo`       | Vira o `.env` do OpenWA, com MCP já configurado     |
 | `mcp.json.exemplo`  | Vira o `.mcp.json` que o Claude Code lê             |
+
+---
+
+## Liberar o Docker Hub no ambiente da nuvem
+
+Só necessário para rodar dentro de uma sessão do Claude Code na nuvem. Para rodar
+na sua máquina ou VPS, pule para o passo 1.
+
+A lista padrão do nível **Trusted** já libera `registry-1.docker.io`,
+`auth.docker.io`, `index.docker.io` e `production.cloudflare.docker.com`. Falta
+o CDN da AWS, que é por onde o Docker Hub entrega as camadas neste caso:
+
+```
+production.cloudfront.docker.com
+```
+
+Em [claude.ai/code](https://claude.ai/code) → seletor de ambientes → ícone de
+configurações do ambiente:
+
+1. **Network access**: trocar de `Trusted` para **`Custom`**
+2. Marcar **"Also include default list of common package managers"** — sem isso
+   você perde todos os padrões, inclusive GitHub e npm
+3. Adicionar `production.cloudfront.docker.com` à lista
+4. Salvar e abrir uma **sessão nova** (a política vale a partir do provisionamento)
+
+### Setup script (opcional, mesma tela)
+
+O cache do ambiente é um snapshot do disco, então compilar a imagem no setup
+script evita recompilar Node + Chromium a cada sessão:
+
+```bash
+if [ ! -d OpenWA ]; then
+  git clone --depth 1 https://github.com/rmyndharis/OpenWA.git
+fi
+cp openwa/env.exemplo OpenWA/.env
+docker compose -f OpenWA/docker-compose.yml build
+```
+
+Containers em execução não persistem no cache — só o que fica em disco. Cada
+sessão ainda precisa subir o stack com `docker compose up -d`.
 
 ---
 
