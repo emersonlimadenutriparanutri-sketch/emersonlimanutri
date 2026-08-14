@@ -3,51 +3,36 @@
 -- 001_profiles_rls.sql — isolamento de profiles entre contas
 --
 -- PROBLEMA QUE ISTO RESOLVE
--- Hoje qualquer usuário autenticado consegue ler a tabela profiles
--- inteira: nome, e-mail e telefone de TODOS os nutricionistas da
--- plataforma. Isso já é um vazamento entre contas, e vira um problema
--- muito maior quando pacientes passarem a ser usuários autenticados —
--- cada paciente leria a base de clientes inteira.
+-- Hoje qualquer usuário autenticado lê a tabela profiles inteira: nome,
+-- e-mail e telefone de TODOS os nutricionistas da plataforma — 148
+-- linhas na última contagem. Isso já é um vazamento entre contas, e
+-- vira um problema muito maior quando pacientes passarem a ser usuários
+-- autenticados: cada paciente leria a base de clientes inteira.
 --
 -- Para comparação: patients está correta e só devolve linhas do dono.
 -- O problema é específico de profiles.
 --
--- Rode este arquivo INTEIRO no SQL Editor do Supabase.
+-- COMO RODAR
+-- Cole este arquivo inteiro no SQL Editor do Supabase e execute.
+-- Não há nada para editar: os UUIDs já estão preenchidos com os valores
+-- reais do seu banco.
+--
 -- É idempotente: pode rodar de novo sem quebrar nada.
 --
--- LEIA A SEÇÃO 0 ANTES DE RODAR.
+-- Depois de rodar, execute 002_verificacao.sql separadamente.
 -- =====================================================================
-
-
--- ---------------------------------------------------------------------
--- 0. Antes de rodar: o que pode quebrar
---
--- Depois desta migration, um nutricionista logado enxerga APENAS a
--- própria linha de profiles. Se alguma tela do app hoje depende de ler
--- profiles de outras contas, ela para de funcionar.
---
--- O caso mais provável é uma tela de administração da plataforma, onde
--- você lista os assinantes. Por isso a seção 1 cria uma allowlist de
--- administradores — preencha-a antes de aplicar a seção 2, ou você
--- perde acesso à sua própria lista de assinantes.
---
--- Rode esta consulta primeiro para ver o estado atual das policies:
---
---   select policyname, cmd, qual
---   from pg_policies
---   where schemaname = 'public' and tablename = 'profiles';
---
--- Guarde o resultado. É o seu ponto de retorno se algo der errado.
--- ---------------------------------------------------------------------
 
 
 -- ---------------------------------------------------------------------
 -- 1. Allowlist de administradores da plataforma
 --
--- Tabela sem nenhuma policy de propósito: com RLS ligada e zero
--- policies, ninguém lê nem escreve pela API. Só service_role (Edge
--- Functions) e o SQL Editor enxergam. Assim, ninguém consegue se
--- promover a admin pelo app.
+-- Se alguma tela sua lista os assinantes, ela precisa continuar lendo
+-- profiles de outras contas. Esta tabela é quem autoriza isso.
+--
+-- Ela fica com RLS ligada e ZERO policies, de propósito: nessa
+-- combinação ninguém lê nem escreve pela API do app. Só o SQL Editor e
+-- as Edge Functions (service_role) enxergam. Assim ninguém consegue se
+-- promover a admin de dentro do produto.
 -- ---------------------------------------------------------------------
 create table if not exists public.platform_admins (
   user_id   uuid primary key references auth.users(id) on delete cascade,
@@ -75,39 +60,31 @@ $$;
 
 
 -- ---------------------------------------------------------------------
--- 1.1 Cadastre-se como admin ANTES de aplicar a seção 2.
+-- 1.1 Emerson Lima Silva (CRN 01 19620) entra como admin.
 --
--- Troque o e-mail abaixo pelo e-mail com que VOCÊ entra no app.
--- Se não souber qual é, rode antes:
+-- Este é o id da linha dele em profiles. Como profiles.id É o id do
+-- usuário no Auth, ele serve direto — sem precisar procurar e-mail de
+-- login, que pode ser diferente do e-mail cadastrado no perfil.
 --
---   select id, email from auth.users order by created_at limit 50;
---
--- Se o insert devolver 0 linhas, o e-mail está errado — corrija antes
--- de seguir, senão você perde o acesso à lista de assinantes.
+-- A foreign key para auth.users protege contra engano: se o id não
+-- existir no Auth, o insert falha em vez de passar batido.
 -- ---------------------------------------------------------------------
 insert into public.platform_admins (user_id)
-select u.id
-from auth.users u
-where u.email = 'TROQUE-PELO-SEU-EMAIL-DE-LOGIN@exemplo.com'
+values ('281b6d15-1b04-432e-a162-d06988887bcc')
 on conflict (user_id) do nothing;
-
--- Confirmação: deve listar você.
-select a.user_id, u.email
-from public.platform_admins a
-join auth.users u on u.id = a.user_id;
 
 
 -- ---------------------------------------------------------------------
 -- 2. Trancar profiles
 --
--- profiles.id É o id do usuário no Auth (confirmado no banco), então a
--- comparação correta é id = auth.uid() — não existe coluna user_id aqui.
+-- profiles.id é o id do usuário no Auth (confirmado no banco), então a
+-- comparação correta é id = auth.uid(). Não existe coluna user_id aqui.
 -- ---------------------------------------------------------------------
 alter table public.profiles enable row level security;
 
--- Remove as policies de SELECT existentes, quaisquer que sejam os nomes.
--- Mexe só em SELECT: policies de INSERT/UPDATE ficam como estão e são
--- recriadas logo abaixo de forma idempotente.
+-- Remove as policies de SELECT existentes, quaisquer que sejam os nomes,
+-- e registra no log o que foi removido. Mexe só em SELECT: policies de
+-- INSERT e UPDATE são recriadas logo abaixo de forma idempotente.
 do $$
 declare
   p record;
@@ -141,7 +118,7 @@ create policy profiles_update_own
   using (id = auth.uid())
   with check (id = auth.uid());
 
--- Criação do próprio perfil (caso o app crie a linha no primeiro login).
+-- Criação do próprio perfil, caso o app crie a linha no primeiro login.
 drop policy if exists profiles_insert_own on public.profiles;
 create policy profiles_insert_own
   on public.profiles
@@ -151,45 +128,32 @@ create policy profiles_insert_own
 
 
 -- ---------------------------------------------------------------------
--- 3. Verificação
+-- 3. Estado final — confira o resultado desta consulta
 --
--- ATENÇÃO: um `select count(*) from profiles` rodado aqui no SQL Editor
--- NÃO prova nada — o editor roda como superusuário e ignora RLS por
--- completo. O teste abaixo simula um usuário autenticado de verdade.
+-- Devem aparecer exatamente três policies:
+--   profiles_select_own  · SELECT
+--   profiles_update_own  · UPDATE
+--   profiles_insert_own  · INSERT
 --
--- Troque o UUID por um nutricionista que NÃO seja você (pegue um em
--- `select id, email from auth.users limit 10`).
+-- Se sobrou alguma outra policy de SELECT, me mande o resultado.
 -- ---------------------------------------------------------------------
-begin;
-  set local role authenticated;
-  set local request.jwt.claims = '{"sub":"TROQUE-POR-UM-UUID-DE-OUTRO-NUTRI","role":"authenticated"}';
-
-  -- Deve retornar exatamente 1 (só a linha dele).
-  select count(*) as linhas_visiveis_para_um_nutri_comum
-  from public.profiles;
-rollback;
-
--- E o seu acesso de admin, que deve continuar vendo todas:
-begin;
-  set local role authenticated;
-  set local request.jwt.claims = '{"sub":"TROQUE-PELO-SEU-UUID","role":"authenticated"}';
-
-  select count(*) as linhas_visiveis_para_o_admin
-  from public.profiles;
-rollback;
+select policyname, cmd, qual, with_check
+from pg_policies
+where schemaname = 'public' and tablename = 'profiles'
+order by cmd, policyname;
 
 
 -- ---------------------------------------------------------------------
 -- 4. Rollback
 --
 -- Se alguma tela do app quebrar e você precisar voltar ao estado
--- anterior enquanto investiga, rode:
+-- anterior enquanto investiga:
 --
 --   drop policy if exists profiles_select_own on public.profiles;
 --   create policy profiles_select_tudo
 --     on public.profiles for select to authenticated using (true);
 --
--- Isso reabre o vazamento — é medida temporária, não solução. O certo
--- é descobrir qual tela precisava de leitura cruzada e resolver com uma
--- view de colunas públicas (nome e CRN, sem contato).
+-- Isso reabre o vazamento — é medida temporária para destravar, não
+-- solução. O certo é descobrir qual tela precisava de leitura cruzada e
+-- resolver com uma view de colunas públicas (nome e CRN, sem contato).
 -- ---------------------------------------------------------------------

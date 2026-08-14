@@ -11,9 +11,9 @@ Começamos por aqui porque é a única etapa que não depende de nenhuma decisã
 aberto: modelo de WhatsApp, gate de assinatura e conteúdo do ciclo não bloqueiam
 nada disto.
 
-| | |
-|---|---|
-| **0.1** | Isolar `profiles` entre contas | `sql/001_profiles_rls.sql` |
+| Etapa | O quê | Onde |
+|---|---|---|
+| **0.1** | Isolar `profiles` entre contas | `sql/001_profiles_rls.sql` + `sql/002_verificacao.sql` |
 | **0.2** | Tornar privado o bucket `avaliacoes-fotos` | procedimento abaixo |
 
 ---
@@ -21,28 +21,39 @@ nada disto.
 ## 0.1 — Isolar `profiles`
 
 Hoje qualquer usuário autenticado lê a tabela `profiles` inteira: nome, e-mail e
-telefone de todos os nutricionistas da plataforma. Com pacientes virando
-usuários autenticados, cada um deles passaria a ler a sua base de clientes.
+telefone de **148 nutricionistas**. Com pacientes virando usuários autenticados,
+cada um deles passaria a ler a sua base de clientes.
 
-**Como aplicar**
+**Como aplicar — não há nada para editar.** Os arquivos já vêm com os UUIDs
+reais preenchidos.
 
-1. Abra o SQL Editor do Supabase.
-2. Rode a consulta de diagnóstico que está na seção 0 do arquivo e **guarde o
-   resultado** — é o ponto de retorno.
-3. Edite o e-mail na seção 1.1 e o UUID na seção 3.
-4. Rode o arquivo inteiro.
-5. Confira as duas contagens da seção 3: um nutricionista comum deve ver `1`, e
-   você como admin deve ver todas.
+1. Abra o SQL Editor:
+   <https://supabase.com/dashboard/project/fhhtewujnevpcatbiuoc/sql/new>
+2. Cole `sql/001_profiles_rls.sql` inteiro e execute. No fim ele lista as
+   policies resultantes — devem ser exatamente três: `profiles_select_own`,
+   `profiles_update_own` e `profiles_insert_own`.
+3. Numa aba nova, cole `sql/002_verificacao.sql` e execute. Os quatro testes
+   devem dar `1`, `148`, `0` e `0`.
+4. Entre no seu app como nutricionista e navegue pelas telas principais.
+
+A verificação é arquivo separado de propósito: ela usa blocos
+`begin … rollback`, que alguns editores não gostam de executar junto com DDL. Se
+algum bloco reclamar, rode um teste por vez — são independentes e nenhum altera
+dado.
+
+**Por que o teste não é um `select count(*)`.** O SQL Editor roda como
+superusuário e ignora RLS. Uma contagem normal devolveria as 148 linhas mesmo
+com as policies perfeitas — passaria sem provar nada. Os testes trocam o papel
+para `authenticated` e forjam as claims de JWT, que é como o Postgres enxerga um
+usuário real vindo do app.
 
 **O que pode quebrar.** Se alguma tela do app hoje lê `profiles` de outras
 contas, ela para de funcionar. O caso mais provável é uma tela sua de
 administração listando assinantes — por isso a migration cria a allowlist
-`platform_admins` e pede que você se cadastre nela **antes** de trancar a
-tabela. Se pular esse passo, você perde acesso à própria lista de assinantes.
+`platform_admins` e já cadastra você nela antes de trancar a tabela.
 
-Depois de aplicar, entre no app como nutricionista e navegue pelas telas
-principais. O rollback está na seção 4 do arquivo, mas ele reabre o vazamento —
-serve para destravar enquanto você investiga, não como solução.
+O rollback está na seção 4 do `001`, mas ele reabre o vazamento — serve para
+destravar enquanto você investiga, não como solução.
 
 > A view `v_nutri_publico`, que deixa o paciente ver o nome e o CRN do
 > nutricionista dele, fica para a fase 1: ela depende da tabela
