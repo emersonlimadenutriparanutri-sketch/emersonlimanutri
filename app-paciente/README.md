@@ -45,16 +45,48 @@ passando como `service_role`.
 
 Telas Admin e Perfil testadas no app, funcionando.
 
-### O que ainda falta provar
+### Verificação
 
-A `002` prova o que a 001 não prova sozinha: que um nutricionista **comum** vê
-só a própria linha. Ela usa `begin … rollback` com troca de papel, que o
-executor de migration da Lovable não aceita — precisa do SQL Editor.
+**A `002` não roda neste ambiente.** O executor de migration da Lovable recusa o
+`set local role authenticated` — *"permission denied to set role"*. O papel de
+banco disponível ali não tem essa permissão, e sem painel do Supabase não há
+outro caminho SQL. O arquivo fica versionado para quando houver acesso direto.
 
-Não é formalidade. Um `select count(*)` no painel roda como superusuário e
-ignora RLS: devolveria as 148 linhas mesmo com as policies erradas. A 002 troca
-o papel para `authenticated` e forja as claims de JWT, que é como o Postgres
-enxerga um usuário real vindo do app.
+A prova veio por outro caminho, e melhor: **pela API HTTP**, que é exatamente
+como o app do paciente vai se conectar. Passa pelo PostgREST de verdade, em vez
+de simular papel dentro do banco.
+
+Rodado do console do navegador, com a anon key e **sem login**:
+
+```
+profiles   → HTTP 200 | linhas: 0
+patients   → HTTP 200 | linhas: 0
+user_roles → HTTP 200 | linhas: 0
+jornada    → HTTP 200 | linhas: 0
+anamnese   → HTTP 200 | linhas: 0
+```
+
+O `200` importa tanto quanto o `0`: a requisição foi aceita e respondida — não é
+erro de chave nem de rota. Visitante anônimo simplesmente não enxerga linha
+nenhuma.
+
+Somado ao que já se sabia — o admin lê as 148 via `has_role`, e a mesma conexão
+lê só os próprios pacientes em `patients` — o isolamento está demonstrado nos
+dois extremos.
+
+**O que resta sem prova direta** é o meio: um nutricionista autenticado e **não**
+admin, que exercita o ramo `id = auth.uid()` da policy. Para o admin esse ramo
+nunca é avaliado, porque o `or has_role(...)` resolve antes.
+
+O risco residual é baixo — a expressão é a mais simples possível e `profiles.id`
+foi confirmado como o id do Auth. Mas o teste pegaria uma classe de problema que
+nenhum outro pega: RLS não estar sendo aplicada ao papel `authenticated` por
+algum motivo estrutural.
+
+Fecha-se assim, quando valer a pena: criar uma conta descartável pelo cadastro
+normal, autenticar por HTTP com `grant_type=password` e listar `profiles`. O
+esperado é 1 linha. O mesmo mecanismo vira o teste automatizado da matriz de
+acesso da fase 1, que tem quinze linhas em vez de uma.
 
 ### `service_role` — verificado
 
