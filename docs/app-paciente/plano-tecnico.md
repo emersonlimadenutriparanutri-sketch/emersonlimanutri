@@ -5,13 +5,14 @@ entra com e-mail e senha e acompanha o próprio processo — da pré-consulta ao
 check-in semanal — enquanto o nutricionista continua no app dele, com o mesmo
 dado, na mesma hora.
 
-**Status:** plano para aprovação. Nada implementado ainda.
+**Status:** fase 0 concluída. Fase 1 em andamento — fundação do banco aplicada
+(`app-paciente/sql/010` a `012`); Edge Functions e telas a seguir.
 
 | | |
 |---|---|
 | Login | e-mail e senha |
-| Hospedagem | Lovable, segundo projeto apontando para o mesmo Supabase |
-| Convite | WhatsApp |
+| Hospedagem | Lovable — projeto separado apontando para este backend (§5) |
+| Convite | link gerado pelo app, enviado pelo nutricionista (§7) |
 | Alcance | funcionalidade da plataforma, para todos os nutricionistas assinantes |
 
 ---
@@ -144,8 +145,8 @@ Isso já é um vazamento entre contas hoje. Com pacientes virando usuários
 e-mails de todos os nutricionistas do sistema** — que é, na prática, a sua base
 de clientes.
 
-Correção: policy de SELECT restrita a `id = auth.uid()`, mais uma view
-`v_nutri_publico` com nome, CRN e avatar — sem contato — para o app do paciente
+Correção: policy de SELECT restrita a `id = auth.uid()`, mais uma função
+`meu_nutri()` com nome, CRN e avatar — sem contato — para o app do paciente
 exibir de quem ele é paciente.
 
 > A verificar junto: existe trigger `on_auth_user_created` que insere em
@@ -213,7 +214,7 @@ já nascem privados.
 A arquitetura não muda: o banco já é multi-tenant. O que muda é a régua.
 
 - **Branding por nutricionista.** O paciente da Márcia vê o nome da Márcia. Sai
-  da view `v_nutri_publico`.
+  da view `meu_nutri()`.
 - **Um domínio só**, com a marca aparecendo depois do login. Subdomínio por
   assinante multiplicaria certificado e configuração sem ganho.
 - **Gate de assinatura.** Precisa existir a flag "este nutri tem o app do
@@ -652,7 +653,7 @@ $$;
 | Tabela | Paciente pode |
 |---|---|
 | `patients` | ler a própria linha, colunas não sensíveis |
-| `profiles` | ler **só** o nutri dele, via `v_nutri_publico` |
+| `profiles` | ler **só** o nutri dele, via `meu_nutri()` |
 | `jornada` | **nada direto** — só via `v_jornada_paciente` |
 | `anamnese` | **nada direto** — contém `observacoesNutricionista` |
 | `agenda_tasks` | **nada direto** — só data e hora, via view |
