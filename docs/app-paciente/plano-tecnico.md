@@ -257,33 +257,48 @@ não existe no app do paciente.
 Não há sincronização entre os dois: **é o mesmo banco.** O que o paciente salva
 aparece do outro lado no instante seguinte, sem fila nem importação.
 
-### ⚠ Restrição descoberta: o projeto roda em Lovable Cloud
+### Como isso funciona em Lovable Cloud — decidido
 
 O Supabase deste projeto é uma instância **gerenciada pela Lovable** (plano
-Tiny), não uma conta Supabase própria. Duas consequências:
+Tiny), não uma conta Supabase própria. A Lovable não oferece vincular dois
+projetos ao mesmo backend: cada projeto novo recebe o seu.
 
-**1. Não há painel do Supabase.** Sem SQL Editor, sem tela de Storage, sem
-configuração de Auth, sem logs. Toda migration, todo bucket e todo secret passa
-por prompt na Lovable. A fase 0 já foi assim, e funcionou — mas a fase 1 tem
-muito mais banco, e testes que trocam papel de usuário (`set local role`)
-podem não passar pelo executor de migration.
+**A saída não passa pela integração dela.** O backend expõe URL e anon key, e
+isso basta para qualquer cliente Supabase se conectar. O app do paciente será um
+**projeto Lovable separado cujo código aponta para a URL e a anon key deste
+backend**. A Lovable vai provisionar um backend para o segundo projeto; ele
+simplesmente fica sem uso.
 
-**2. E esta é a que ameaça a arquitetura:** o desenho de dois apps depende de os
-dois falarem com o **mesmo** banco. No Lovable Cloud, cada projeto normalmente
-recebe o próprio backend provisionado — o que tornaria um segundo projeto uma
-base separada, e aí não existe "mesmo banco, sem sincronização". O produto
-inteiro descrito neste plano depende disso.
+Isso preserva o que motivava a separação: o código do financeiro, dos leads e
+dos funis não existe no bundle do paciente.
 
-Três saídas possíveis, em ordem de preferência:
+Três consequências operacionais:
 
-| Saída | O que muda |
-|---|---|
-| **A. Migrar para uma conta Supabase própria** | Recupera o painel e libera o segundo projeto. Melhor resultado; depende de a Lovable suportar a migração com os dados. |
-| **B. Segundo projeto apontando para este backend** | Mantém tudo como planejado, se a Lovable permitir conectar um projeto novo a um backend existente. |
-| **C. App do paciente como área do mesmo projeto** | Só se A e B forem impossíveis. Perde-se a separação de bundle, e o risco de vazamento por erro de rota volta — o que torna o teste automatizado de RLS (§8) obrigatório, não recomendado. |
+1. **A service_role key não é exposta pelo Lovable Cloud.** Logo, as Edge
+   Functions privilegiadas — `patient-invite` e `patient-accept-invite`, que
+   criam usuário no Auth — **ficam neste projeto**, e o app do paciente as chama
+   por HTTP com CORS liberado para o domínio dele. Efeito colateral bom: todo o
+   código privilegiado mora num lugar só.
 
-Enquanto isso não estiver respondido, a fase 1 não deve começar: a resposta muda
-onde o código do app do paciente vive.
+2. **As migrations continuam saindo deste projeto.** O segundo projeto não
+   gerencia este banco; ele só o consome. Toda alteração de schema segue pelo
+   prompt da Lovable daqui.
+
+3. **O domínio do app do paciente precisa entrar nas redirect URLs do Auth**,
+   que também se configura por aqui.
+
+**Sem painel do Supabase.** Sem SQL Editor, sem tela de Storage, sem logs. A
+fase 0 já foi assim e funcionou, mas testes que trocam papel de usuário
+(`set local role`) podem não passar pelo executor de migration — o que deixa a
+verificação de RLS dependente da Lovable aceitar rodá-la.
+
+Migrar para uma conta Supabase própria continua sendo o destino certo algum dia:
+recupera painel, service_role e integração oficial. Mas é migração manual de um
+produto com 148 assinantes em produção, e a própria Lovable avisa que metadata
+de Auth pode não migrar inteiro — 148 pessoas sem conseguir entrar é o pior
+resultado possível. Fica como operação planejada à parte, nunca como
+pré-requisito do app do paciente. Vale saber que fica **mais cara** quanto mais
+dado de paciente acumular.
 
 ---
 
