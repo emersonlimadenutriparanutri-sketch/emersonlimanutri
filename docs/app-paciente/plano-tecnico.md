@@ -549,20 +549,54 @@ aparece para todo mundo por padrão.
 
 ---
 
-## 7. Convite por WhatsApp
+## 7. Convite por link — quem envia é o nutricionista
+
+**O sistema não envia nada.** Ele gera o link, e o nutricionista manda pelo mesmo
+WhatsApp em que já conversa com aquele paciente. Um botão pode abrir o WhatsApp
+com a mensagem pronta, mas quem aperta enviar é ele.
 
 ```
 1. Nutri clica "Convidar paciente"
-     → patient-invite (service_role) normaliza o telefone, gera token, grava o hash
-     → enfileira template aprovado com botão de URL dinâmica
-2. Paciente toca no botão → define e-mail e senha
+     → patient-invite (service_role) gera o token, grava só o hash
+     → devolve o link UMA vez, para copiar
+     → o nutri envia pelo WhatsApp dele
+2. Paciente abre o link e define e-mail e senha
      → patient-accept-invite valida token e prazo, cria auth.user com role='patient',
        cria patient_users, registra o consentimento
 3. Dali em diante: login normal
 ```
 
+**O que isso remove do caminho crítico:**
+
+| | Link manual | Envio automático pela Meta |
+|---|---|---|
+| Aprovação de template | não precisa | pode reprovar, leva até 24h |
+| Custo por mensagem | zero | cobrado por conversa |
+| Tempo até funcionar | imediato | semanas |
+| Remetente | o nutricionista | número desconhecido, ou o dele com burocracia |
+| Trabalho manual | copiar e colar | nenhum |
+
+Com 3 a 5 pacientes no piloto, copiar e colar é irrelevante. Com 50 por mês
+incomoda — e aí a automação entra por cima, já sabendo se o produto funciona.
+
+E há um ganho que o envio automático não teria: **o link chegando pelo WhatsApp
+do próprio nutricionista converte melhor.** O paciente já conversa com ele ali, e
+a mensagem vem com uma frase dele em vez de disparo de robô.
+
+**O modelo de dados é o mesmo nos dois casos** — o convite continua sendo um
+token com prazo. A única diferença é quem aperta enviar, então automatizar depois
+não exige refazer nada.
+
 **Cadastro aberto não pode existir.** O vínculo só é criado por código
 privilegiado, e o token vai hasheado.
+
+---
+
+### 7.1 A automação, para depois
+
+O que está abaixo descreve o envio automático pela Cloud API da Meta. **Não entra
+no lançamento.** Fica registrado porque a análise continua válida no dia em que o
+volume justificar.
 
 **Guarda de telefone.** `wa_normalizar_telefone()` devolve `NULL` quando o número
 não é confiável — e o banco tem telefone em três formatos. O botão precisa estar
@@ -695,7 +729,7 @@ Isso é fase tardia. Nada aqui bloqueia o lançamento.
 | Fase | Entrega | Depende de |
 |---|---|---|
 | **0** | Segurança: RLS de `profiles`, bucket privado, teste automatizado da matriz | — |
-| **1** | Fundação: `patient_users`, convites, views, template aprovado na Meta, gate de assinatura | 0 |
+| **1** | Fundação: `patient_users`, convite por link, `is_patient_of`, views seguras, gate de assinatura | 0 |
 | **2** | **Pré-consulta**: login, PWA, anamnese pelo app, anexo de exames, rascunho revisável | 1 |
 | **3** | Rastreamento metabólico: criar o tipo, o modelo e a tela | 2 |
 | **4** | **Ciclo semanal**: aba Check-ins, resposta, feedback publicável | 2 |
@@ -761,8 +795,9 @@ contratual, não técnica.
 
 ## 13. Aberto — precisa de decisão ou verificação
 
-1. **De qual número sai o WhatsApp** — modelo A ou B (§7). Maior impacto no
-   cronograma.
+1. ~~De qual número sai o WhatsApp~~ — **resolvido**: nenhum. O nutricionista
+   envia o link pelo WhatsApp dele (§7). A automação e a decisão de número saem
+   do caminho crítico.
 2. **Nome do app externo de prescrição**, para verificar se ele tem API de
    exportação — mudaria "subir PDF na mão" para "puxar automático" mais adiante.
 3. **Quem escreve as orientações por fase do ciclo?** Você escreve as suas, ou a
