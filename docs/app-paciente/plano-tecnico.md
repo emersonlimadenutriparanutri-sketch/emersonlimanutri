@@ -636,6 +636,19 @@ Três pontos de atenção:
 
 - `questionario_respostas` **não tem coluna `user_id`** — a policy precisa passar
   por `envio_id` até `questionario_envios`.
+- **A policy do bucket `questionario-uploads` não conhece o paciente.** Ela roda
+  pela função `can_read_questionario_upload(_path)`, que hoje libera leitura para
+  admin ou para o nutricionista dono do envio (`e.user_id = auth.uid()`). Está
+  correta — não é buraco — mas não tem ramo de paciente, então o paciente logado
+  não conseguirá abrir o arquivo do próprio questionário. Precisa ganhar
+  `or public.is_patient_of(e.patient_id)` junto com o resto da fase 1.
+- **Endurecimento de baixa prioridade, mas antes de os pacientes entrarem:**
+  `has_role(_user_id, _role)` e `is_approved_user(_user_id)` aceitam qualquer
+  uuid e não checam quem está chamando. Não devolvem linha, só um booleano, e já
+  foram fechadas para `anon` — mas com pacientes autenticados qualquer um deles
+  poderá perguntar se um uuid é admin ou está aprovado. Restringir a
+  `_user_id = auth.uid()` ou chamador admin resolve, e o app não quebra: ele já
+  chama passando o próprio id.
 - Documentos não são visíveis por padrão. Precisa de
   `liberado_para_paciente boolean default false` em resumos, relatórios e plano.
   Padrão negado, liberação explícita.
@@ -755,9 +768,11 @@ contratual, não técnica.
 3. **Quem escreve as orientações por fase do ciclo?** Você escreve as suas, ou a
    plataforma entra com um conjunto padrão que o assinante edita? A segunda
    opção é o que faz a aba não nascer vazia para quem assina.
-4. **Assinatura: é Hotmart.** Existe uma Edge Function `hotmart-webhook`, então
-   o gate da §4 provavelmente sai do que ela grava. Falta confirmar em qual
-   tabela, e se há um campo de plano ou só de status de pagamento.
+4. **Assinatura: Hotmart, e o gate provavelmente é `user_features.approved`.**
+   Existe uma Edge Function `hotmart-webhook`, e a função `is_approved_user`
+   revela uma tabela `user_features` com coluna `approved`. É o candidato natural
+   para pendurar a flag "este nutri tem o app do paciente". Falta ver as colunas
+   dessa tabela e se ela distingue plano ou só aprovação.
 5. Confirmar se `receitas` é mesmo financeira (§6.5).
 6. Colunas de `raio_x_semanal`, hoje vazia: reaproveitar ou criar nova?
 7. Existe trigger de criação automática em `profiles` no signup?
