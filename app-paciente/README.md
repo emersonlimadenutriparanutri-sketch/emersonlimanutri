@@ -1,15 +1,57 @@
-# App do Paciente — Fase 0
+# App do Paciente — Fases 0 e 1 (banco)
 
-Primeira etapa do [plano técnico](../docs/app-paciente/plano-tecnico.md).
+Registro do que foi aplicado, na ordem, com o porquê. Acompanha o
+[plano técnico](../docs/app-paciente/plano-tecnico.md).
 
-A fase 0 não constrói nada do app do paciente. Ela fecha as portas que precisam
-estar fechadas **antes** de qualquer paciente virar usuário autenticado — e as
-duas já valiam a pena hoje, mesmo que o app nunca fosse construído.
+## Estado
 
-| Etapa | O quê | Situação |
+| Fase | O quê | Situação |
 |---|---|---|
-| **0.1** | Isolar `profiles` entre contas | **Aplicada.** Falta rodar `sql/003_limpeza_profiles.sql` |
-| **0.2** | Bucket de fotos e laudos privado | **Já estava resolvida** — ver abaixo |
+| **0.1** | Isolar `profiles` entre contas | aplicada e verificada |
+| **0.2** | Bucket de fotos e laudos privado | já estava resolvida |
+| **1** | Vínculo, convite, `is_patient_of`, `meu_nutri`, consentimento | aplicada e verificada |
+| **1** | Edge Functions de convite e aceite | implantadas, ciclo testado ponta a ponta |
+
+Falta, para a fase 1 fechar: o app do paciente existir — projeto Lovable novo,
+rota `/convite`, login e uma tela inicial.
+
+## Migrations, na ordem
+
+| | O quê |
+|---|---|
+| `001` | tranca `profiles`; cria `platform_admins` (aposentada na 005) |
+| `002` | verificação de isolamento — **não roda no Lovable Cloud**, ver abaixo |
+| `003` | remove policies redundantes de INSERT/UPDATE |
+| `004` | corrige o revoke que não pegou (grant herdado de `PUBLIC`) |
+| `005` | aposenta `platform_admins`; admin passa a sair de `user_roles` |
+| `010` | `patient_users`, `patient_invites`, `is_patient_of`, `v_nutri_publico` |
+| `011` | desvio nas triggers de signup — **não funciona sozinha**, ver 014 |
+| `012` | troca a view por `meu_nutri()`; fecha as funções de trigger |
+| `013` | consentimento no vínculo |
+| `014` | o que de fato impede paciente de virar nutricionista |
+| `015` | fecha a leitura de `user_roles` |
+
+## Os quatro achados de segurança
+
+Nenhum tinha a ver com o app do paciente. Ele só forçou o olhar.
+
+| Achado | Alcance | Corrigido em |
+|---|---|---|
+| `profiles` legível por qualquer autenticado — 148 e-mails | toda a plataforma | `001` |
+| Duas listas de admin em paralelo | introduzido pela `001`, corrigido | `005` |
+| `has_role` chamável por visitante deslogado | toda a plataforma | `004` |
+| `user_roles` legível por qualquer autenticado | toda a plataforma | `015` |
+
+## Isolamento verificado nos três níveis
+
+Provado pela API HTTP, que é como o app do paciente se conecta — não por
+consulta no editor, que roda como superusuário e ignora RLS.
+
+| Quem | Linhas visíveis em `profiles` |
+|---|---|
+| Visitante sem login | 0 |
+| Nutricionista comum | 1 |
+| Admin | 148 |
 
 ---
 
