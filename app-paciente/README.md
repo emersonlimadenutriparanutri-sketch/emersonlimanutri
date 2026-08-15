@@ -12,6 +12,7 @@ Registro do que foi aplicado, na ordem, com o porquê. Acompanha o
 | **1** | Vínculo, convite, `is_patient_of`, `meu_nutri`, consentimento | aplicada e verificada |
 | **1** | Edge Functions de convite e aceite | implantadas e verificadas |
 | **1** | App do paciente — `/convite`, `/login`, início | **no ar e testado no celular** |
+| **1** | Cartão "App do paciente" na ficha, com geração de link e envio por WhatsApp | no ar |
 
 **Fase 1 completa.** O ciclo foi percorrido inteiro com dado real: convite
 gerado no app do nutricionista, link aberto no celular, conta criada pelo
