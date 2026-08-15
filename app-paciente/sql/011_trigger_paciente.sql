@@ -2,6 +2,18 @@
 -- App do Paciente — Fase 1
 -- 011_trigger_paciente.sql — paciente não vira nutricionista
 --
+-- ⚠ ESTA MIGRATION NÃO RESOLVE O PROBLEMA SOZINHA. VEJA A 014.
+--
+-- O desvio abaixo nunca dispara no fluxo real: o GoTrue insere a linha
+-- em auth.users primeiro e aplica o app_metadata depois, num update, e
+-- estas triggers são AFTER INSERT. Testado com conta real — a linha em
+-- profiles foi criada mesmo assim.
+--
+-- Quem resolve é a 014, que reage ao update em que a marca chega.
+-- Este arquivo fica porque o desvio continua correto e evitaria um
+-- criar-e-apagar caso o GoTrue passe a gravar app_metadata no insert.
+-- Mas ele não é a proteção.
+--
 -- O PROBLEMA
 -- Duas triggers disparam a cada insert em auth.users:
 --
