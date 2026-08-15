@@ -19,18 +19,35 @@ lugar só.
 | Secret | Para quê | Exemplo |
 |---|---|---|
 | `PATIENT_APP_URL` | montar o link do convite | `https://app-paciente.lovable.app` |
-| `PATIENT_APP_ORIGINS` | CORS — origens autorizadas, separadas por vírgula | `https://app-nutri.lovable.app,https://app-paciente.lovable.app` |
 
-**`PATIENT_APP_ORIGINS` precisa das DUAS origens**, apesar do nome. As duas
-funções compartilham o mesmo `cors.ts`, e elas são chamadas de lugares
-diferentes: `patient-invite` vem do app do nutricionista, `patient-accept-invite`
-vem do app do paciente. Listar só a do paciente faz o navegador bloquear a
-resposta do convite — a função executa, mas o app do nutricionista nunca lê o
-resultado.
+Um só. `PATIENT_APP_ORIGINS` existiu numa versão anterior e foi removido — ver
+abaixo.
 
-Sintoma quando falta: erro de CORS no console, com a requisição aparecendo como
-bem-sucedida na aba Network. É confuso justamente porque nada falhou no
-servidor.
+## CORS é `*`, e aqui isso é seguro
+
+A primeira versão mantinha uma allowlist de origens por secret. Ela foi retirada
+depois de custar uma rodada inteira de depuração, e a análise que motivou a
+retirada:
+
+CORS protege contra um site malicioso usar a sessão da vítima. Isso vale quando
+a credencial viaja em **cookie**, que o navegador anexa sozinho a toda
+requisição. Não é o caso aqui — a autenticação vai no cabeçalho `Authorization`,
+montado pelo código do app a partir do `localStorage` do próprio domínio. Um
+site de terceiros não consegue obtê-lo, então não forja chamada autenticada,
+com ou sem allowlist.
+
+E `patient-accept-invite` é pública por natureza: quem quisesse chamá-la faria
+do próprio servidor, onde CORS nem se aplica.
+
+Quem protege estas funções de verdade:
+
+| Função | Proteção real |
+|---|---|
+| `patient-invite` | `getUser()` + conferência de que o paciente é do chamador |
+| `patient-accept-invite` | token de 256 bits, conferido por hash, com prazo e uso único |
+
+**Se um dia alguma destas funções passar a usar cookie de sessão**, `*` deixa de
+servir e a allowlist volta a ser necessária.
 
 As três variáveis restantes (`SUPABASE_URL`, `SUPABASE_ANON_KEY`,
 `SUPABASE_SERVICE_ROLE_KEY`) já são injetadas automaticamente.
