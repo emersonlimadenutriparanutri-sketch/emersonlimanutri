@@ -5,11 +5,22 @@
 -- Primeira policy de paciente em tabela clínica. Até aqui ele só via o
 -- próprio vínculo e o nome do nutricionista.
 --
--- SÓ LEITURA. O caminho de escrita (gravar a resposta) fica de fora de
--- propósito: ainda não está decidido se o app do paciente vai reusar a
--- Edge Function questionario-publico, que já existe e já é usada pelo
--- link tokenizado, ou se ganha uma função própria. Escrever a policy
--- antes dessa decisão seria adivinhar.
+-- SÓ LEITURA, e assim permanece: a escrita não precisa de policy.
+--
+-- Levantamento posterior mostrou que a Edge Function
+-- questionario-publico já faz o caminho inteiro — valida token e prazo,
+-- grava em questionario_respostas, atualiza o envio para "respondido" e
+-- ainda sincroniza a jornada, marcando a tarefa correspondente como
+-- concluída. Ela roda com service_role, então não depende de policy.
+--
+-- O app do paciente usa essa mesma função. A única diferença em relação
+-- ao link público é como ele chega ao token: em vez de recebê-lo por
+-- WhatsApp, lista os próprios envios — que é justamente o que as
+-- policies abaixo permitem — e usa o token de dentro.
+--
+-- Reaproveitar evitou reimplementar a sincronização da jornada, que é a
+-- parte mais delicada, e evitou um segundo caminho de escrita com bugs
+-- próprios.
 --
 -- Rode depois da 015. É idempotente.
 -- =====================================================================
