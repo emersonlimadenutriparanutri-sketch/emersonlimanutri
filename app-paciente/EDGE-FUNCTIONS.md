@@ -45,24 +45,50 @@ da lista não recebe cabeçalho de permissão e o navegador bloqueia.
 
 ---
 
-## `patient-accept-invite` roda sem JWT
-
-Precisa ser configurada com verificação de JWT **desativada**. O paciente ainda
-não tem conta quando a chama — se exigisse sessão, nunca seria possível criar a
-primeira.
-
-No `supabase/config.toml`:
+## As duas rodam com `verify_jwt = false`
 
 ```toml
+[functions.patient-invite]
+verify_jwt = false
+
 [functions.patient-accept-invite]
 verify_jwt = false
 ```
 
-Na Lovable, peça explicitamente que esta função seja pública.
+Pelos dois motivos diferentes abaixo. Na Lovable, peça explicitamente que ambas
+sejam públicas.
 
-Isso deixa a função exposta à internet, e é por isso que o token do convite
-carrega o peso todo: 256 bits aleatórios, conferido por hash, com prazo e uso
-único.
+**`patient-accept-invite`** porque o paciente ainda não tem conta quando a
+chama. Se exigisse sessão, nunca seria possível criar a primeira. Quem autoriza
+é o token do convite, e é por isso que ele carrega o peso todo: 256 bits
+aleatórios, conferido por hash, com prazo e uso único.
+
+**`patient-invite`** por causa do CORS. O `OPTIONS` de preflight que o navegador
+manda antes do POST **não carrega cabeçalho de autenticação** — é assim por
+especificação. Com `verify_jwt = true`, a plataforma rejeita esse OPTIONS com
+401 antes de o código da função rodar, e um 401 da plataforma não traz
+cabeçalho de CORS. O navegador então bloqueia, e o sintoma é confuso: erro de
+CORS num endpoint cuja configuração de CORS está correta.
+
+Isso **não deixa a função aberta**. Ela autentica por conta própria: lê o
+`Authorization`, chama `getUser()`, devolve 401 sem sessão, e ainda confere que
+o paciente pertence a quem está chamando. A verificação não desapareceu — saiu
+da porta da plataforma e foi para dentro do código, onde consegue responder o
+preflight antes de exigir sessão.
+
+Sintoma de quando falta:
+
+```
+Access to fetch ... has been blocked by CORS policy: Response to preflight
+request doesn't pass access control check: No 'Access-Control-Allow-Origin'
+header is present on the requested resource.
+```
+
+## Secret novo exige reimplantação
+
+O `cors.ts` lê `PATIENT_APP_ORIGINS` uma vez, quando o módulo carrega. Uma
+instância já em execução continua com o valor antigo. Depois de mudar o secret,
+reimplante as duas funções.
 
 ---
 
