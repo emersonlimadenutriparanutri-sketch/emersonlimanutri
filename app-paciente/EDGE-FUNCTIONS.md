@@ -34,9 +34,13 @@ lugar só.
 
 ## Antes de implantar: dois secrets
 
-| Secret | Para quê | Exemplo |
+| Secret | Para quê | Valor |
 |---|---|---|
-| `PATIENT_APP_URL` | montar o link do convite | `https://app-paciente.lovable.app` |
+| `PATIENT_APP_URL` | montar o link do convite | `https://meu-nutri-conecta.lovable.app` |
+
+O app do paciente é o projeto Lovable **meu-nutri-conecta**, apontando para este
+backend por `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` — sem Lovable Cloud
+próprio, sem tabelas próprias.
 
 Um só. `PATIENT_APP_ORIGINS` existiu numa versão anterior e foi removido — ver
 abaixo.
