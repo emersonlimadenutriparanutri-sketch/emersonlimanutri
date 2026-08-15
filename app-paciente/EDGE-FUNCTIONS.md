@@ -19,7 +19,18 @@ lugar só.
 | Secret | Para quê | Exemplo |
 |---|---|---|
 | `PATIENT_APP_URL` | montar o link do convite | `https://app-paciente.lovable.app` |
-| `PATIENT_APP_ORIGINS` | CORS — origens autorizadas, separadas por vírgula | `https://app-paciente.lovable.app` |
+| `PATIENT_APP_ORIGINS` | CORS — origens autorizadas, separadas por vírgula | `https://app-nutri.lovable.app,https://app-paciente.lovable.app` |
+
+**`PATIENT_APP_ORIGINS` precisa das DUAS origens**, apesar do nome. As duas
+funções compartilham o mesmo `cors.ts`, e elas são chamadas de lugares
+diferentes: `patient-invite` vem do app do nutricionista, `patient-accept-invite`
+vem do app do paciente. Listar só a do paciente faz o navegador bloquear a
+resposta do convite — a função executa, mas o app do nutricionista nunca lê o
+resultado.
+
+Sintoma quando falta: erro de CORS no console, com a requisição aparecendo como
+bem-sucedida na aba Network. É confuso justamente porque nada falhou no
+servidor.
 
 As três variáveis restantes (`SUPABASE_URL`, `SUPABASE_ANON_KEY`,
 `SUPABASE_SERVICE_ROLE_KEY`) já são injetadas automaticamente.
