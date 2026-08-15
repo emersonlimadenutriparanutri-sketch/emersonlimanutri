@@ -1,5 +1,23 @@
 # Edge Functions do convite — como implantar
 
+**Estado: implantadas e verificadas de ponta a ponta.**
+
+| Etapa | Resultado |
+|---|---|
+| `patient-invite` gera link | `HTTP 200` — token, prazo de 7 dias e nome do paciente |
+| Secrets chegam à função | sim — o link volta com o valor de `PATIENT_APP_URL`, não `undefined` |
+| `patient-accept-invite` cria conta e vínculo | `HTTP 200 { ok: true }` |
+
+Uma nota honesta sobre o caminho até aqui: a allowlist de CORS falhou por motivo
+que não ficou esclarecido. Os secrets comprovadamente chegam às funções — o link
+volta preenchido —, então a lista de origens deveria ter sido lida. A hipótese
+que resta é instância antiga servindo o preflight apesar da reimplantação. Não
+foi investigado até o fim porque a allowlist saiu por mérito próprio (ver
+"CORS é `*`"), não como contorno.
+
+---
+
+
 Duas funções, ambas neste projeto (o do nutricionista). Elas **não** vão no
 projeto do app do paciente: o Lovable Cloud não expõe a `service_role` key, e
 sem ela não há como criar usuário no Auth. O app do paciente as chama por HTTP.
