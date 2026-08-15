@@ -5,8 +5,9 @@ entra com e-mail e senha e acompanha o próprio processo — da pré-consulta ao
 check-in semanal — enquanto o nutricionista continua no app dele, com o mesmo
 dado, na mesma hora.
 
-**Status:** fase 0 concluída. Fase 1 em andamento — fundação do banco aplicada
-(`app-paciente/sql/010` a `012`); Edge Functions e telas a seguir.
+**Status:** fases 0 e 1 concluídas e verificadas com dado real. O app do paciente
+está no ar (`meu-nutri-conecta.lovable.app`) com convite, login e tela inicial.
+Próxima: fase 2 — anamnese preenchida pelo paciente antes da consulta.
 
 | | |
 |---|---|

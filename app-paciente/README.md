@@ -10,10 +10,27 @@ Registro do que foi aplicado, na ordem, com o porquê. Acompanha o
 | **0.1** | Isolar `profiles` entre contas | aplicada e verificada |
 | **0.2** | Bucket de fotos e laudos privado | já estava resolvida |
 | **1** | Vínculo, convite, `is_patient_of`, `meu_nutri`, consentimento | aplicada e verificada |
-| **1** | Edge Functions de convite e aceite | implantadas, ciclo testado ponta a ponta |
+| **1** | Edge Functions de convite e aceite | implantadas e verificadas |
+| **1** | App do paciente — `/convite`, `/login`, início | **no ar e testado no celular** |
 
-Falta, para a fase 1 fechar: o app do paciente existir — projeto Lovable novo,
-rota `/convite`, login e uma tela inicial.
+**Fase 1 completa.** O ciclo foi percorrido inteiro com dado real: convite
+gerado no app do nutricionista, link aberto no celular, conta criada pelo
+paciente, vínculo estabelecido, e `meu_nutri()` devolvendo o nutricionista
+correto na tela do paciente.
+
+### Os dois projetos Lovable
+
+| Projeto | O que vive lá |
+|---|---|
+| **denutriparanutri** | banco, migrations, Edge Functions, secrets, app do nutricionista |
+| **meu-nutri-conecta** | só o app do paciente — nenhum backend próprio |
+
+Regra: tudo que é banco, função ou secret vai no **denutriparanutri**. O app do
+paciente apenas consome, via `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`.
+
+Pedir secret ou migration ao projeto errado não causa dano — ele simplesmente
+não tem acesso —, mas custa uma rodada. Vale nomear o projeto em toda
+instrução.
 
 ## Migrations, na ordem
 
