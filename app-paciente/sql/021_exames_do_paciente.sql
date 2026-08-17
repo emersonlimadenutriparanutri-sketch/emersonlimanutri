@@ -20,7 +20,28 @@
 -- corrigido. Laudo de exame é dado de saúde: nunca deve ser alcançável
 -- por quem tem só a URL.
 --
--- Limites no servidor:
+-- ⚠ OS LIMITES ABAIXO NÃO FORAM APLICADOS.
+--
+-- O Lovable Cloud bloqueia UPDATE direto em storage.buckets, e as
+-- ferramentas de Storage disponíveis só criam bucket e alteram a flag
+-- public. Sem painel do Supabase, não há caminho. O UPDATE fica no
+-- arquivo para quando houver acesso direto — hoje ele roda sem efeito.
+--
+-- Consequência: tamanho e tipo de arquivo são validados apenas no app
+-- do paciente.
+--
+-- O risco disso é menor do que "validação no cliente" costuma sugerir.
+-- A policy de INSERT exige paciente_dono_do_prefixo, então não é uma
+-- porta aberta a qualquer um com a chave anon: só um paciente
+-- autenticado escreve, e só na própria pasta. O que sobra é abuso por
+-- usuário legítimo — arquivo grande demais ou de tipo estranho na
+-- pasta dele. Desperdício e incômodo, não vazamento.
+--
+-- Não vale construir uma Edge Function de upload por causa disso: o
+-- arquivo passaria inteiro por ela, num plano Tiny, para proteger
+-- contra um paciente abusando do próprio espaço.
+--
+-- Limites pretendidos, quando for possível aplicá-los:
 --   20 MB   — laudo com imagens costuma passar de 5 MB; 20 dá folga
 --             sem virar upload de vídeo
 --   tipos   — PDF e imagem. Nada de zip, doc ou executável.
