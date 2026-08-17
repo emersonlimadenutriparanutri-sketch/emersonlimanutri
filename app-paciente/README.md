@@ -15,6 +15,8 @@ Registro do que foi aplicado, na ordem, com o porquê. Acompanha o
 | **1** | Cartão "App do paciente" na ficha, com geração de link e envio por WhatsApp | no ar |
 | **2** | Policies de leitura de questionários (`020`) | aplicada |
 | **2** | Tela de responder questionário no app do paciente | **no ar e testada com paciente real** |
+| **2** | Bucket, policies e tabela de exames do paciente (`021`) | aplicada — sem os limites de bucket, ver o arquivo |
+| **2** | Telas de enviar e de receber exame | no ar |
 
 **Fase 1 completa.** O ciclo foi percorrido inteiro com dado real: convite
 gerado no app do nutricionista, link aberto no celular, conta criada pelo
