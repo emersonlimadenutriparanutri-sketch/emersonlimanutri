@@ -13,6 +13,8 @@ Registro do que foi aplicado, na ordem, com o porquê. Acompanha o
 | **1** | Edge Functions de convite e aceite | implantadas e verificadas |
 | **1** | App do paciente — `/convite`, `/login`, início | **no ar e testado no celular** |
 | **1** | Cartão "App do paciente" na ficha, com geração de link e envio por WhatsApp | no ar |
+| **2** | Policies de leitura de questionários (`020`) | aplicada |
+| **2** | Tela de responder questionário no app do paciente | **no ar e testada com paciente real** |
 
 **Fase 1 completa.** O ciclo foi percorrido inteiro com dado real: convite
 gerado no app do nutricionista, link aberto no celular, conta criada pelo

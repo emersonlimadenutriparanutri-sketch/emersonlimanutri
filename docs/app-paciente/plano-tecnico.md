@@ -5,9 +5,14 @@ entra com e-mail e senha e acompanha o próprio processo — da pré-consulta ao
 check-in semanal — enquanto o nutricionista continua no app dele, com o mesmo
 dado, na mesma hora.
 
-**Status:** fases 0 e 1 concluídas e verificadas com dado real. O app do paciente
-está no ar (`meu-nutri-conecta.lovable.app`) com convite, login e tela inicial.
-Próxima: fase 2 — anamnese preenchida pelo paciente antes da consulta.
+**Status:** fases 0, 1 e o núcleo da 2 concluídos e verificados com dado real. O
+app do paciente está no ar (`meu-nutri-conecta.lovable.app`): convite, login,
+tela inicial e **anamnese preenchida pelo paciente antes da consulta**, chegando
+no app do nutricionista.
+
+Falta da fase 2: o mapeamento `campo_anamnese`, que transforma as respostas em
+rascunho de ficha em vez de leitura e digitação (§6.3), e o rastreamento
+metabólico, que precisa do tipo e do modelo criados.
 
 | | |
 |---|---|
