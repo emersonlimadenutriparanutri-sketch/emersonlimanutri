@@ -18,6 +18,8 @@ Registro do que foi aplicado, na ordem, com o porquê. Acompanha o
 | **2** | Bucket, policies e tabela de exames do paciente (`021`) | aplicada — sem os limites de bucket, ver o arquivo |
 | **2** | Telas de enviar e de receber exame | no ar |
 | **2** | Modelo do Rastreamento Metabólico (`022`) | aplicado — conferir a lista de sintomas |
+| **2** | Colunas de relatório em `questionario_respostas` (`023`) | aplicada |
+| **2** | `analise-rastreamento-ia` + aba na ficha, com comparativo | no ar |
 
 **Fase 1 completa.** O ciclo foi percorrido inteiro com dado real: convite
 gerado no app do nutricionista, link aberto no celular, conta criada pelo
