@@ -1,103 +1,72 @@
-# Campanha: Passo a passo "Seu próprio ManyChat com Claude"
+# Mensagem para o grupo de WhatsApp — Imersão Claude
 
-**Público:** nutricionistas que participaram da Imersão Claude
-**Objetivo:** vender o passo a passo de implementação da automação própria
-**O que a ferramenta faz:** quem comenta/interage no post recebe a recompensa automaticamente e o WhatsApp desse lead cai na sua lista
-**Ângulo:** você já está na frente — agora tira a mensalidade de R$ 249,90 do seu bolso
-
----
-
-## 1. Mensagem principal (WhatsApp / broadcast)
-
-Oi, [Nome]! 👋
-
-Você esteve na Imersão Claude comigo.
-
-Deixa eu te fazer uma pergunta honesta: **você já conseguiu colocar alguma coisa em prática?**
-
-Se já colocou — parabéns de verdade. Você já está à frente de muita gente. Enquanto a maioria dos nutricionistas ainda anota número de lead em papel, você já entendeu que dá pra ter a IA trabalhando pra você.
-
-Se ainda não colocou — relaxa. É exatamente por isso que essa mensagem existe.
-
-**Hoje eu vou liberar o passo a passo completo para você implementar a SUA própria automação de captura.** Do zero. Criando tudo com o Claude.
-
-Funciona assim: você posta, o lead comenta a palavra-chave, e a automação faz o resto —
-
-✅ entrega a recompensa (ebook, receita, checklist, o que você quiser) na hora
-✅ captura o WhatsApp de quem comentou e interagiu no post
-✅ organiza tudo numa lista sua, com nome e número, pronta pra usar
-✅ trabalha sozinha às 23h de domingo, enquanto você atende ou dorme
-
-Ou seja: cada post seu vira **lista de WhatsApp**, em vez de virar só like que não paga boleto.
-
-E o ponto mais importante: **esse contato é seu.** Não fica preso em plataforma nenhuma.
-
-Hoje o ManyChat cobra **R$ 249,90 por mês**. Todo mês. Pra sempre. E ele nunca vai ser seu.
-
-O que eu vou te mostrar tem **custo de mensalidade ZERO** — porque a ferramenta é *sua*. Você cria, você muda, você manda.
-
-São quase **R$ 3.000 por ano** que ficam com você em vez de ir pra fora.
-
-Se você quer o passo a passo, responde aqui com **QUERO** que eu te mando o acesso.
-
-Um abraço,
-Emerson
+**Onde:** grupo de WhatsApp dos participantes da Imersão Claude
+**O que vende:** passo a passo para o nutri criar a própria automação de captura com o Claude
+**O que a ferramenta faz:** quem comenta/interage no post recebe a recompensa e o WhatsApp cai na lista do nutri
+**Ângulo:** você já está na frente — agora tira a mensalidade de R$ 249,90 do bolso
 
 ---
 
-## 2. Versão curta (story / status / lembrete)
+## 1. Mensagem principal (para colar no grupo)
 
-Você participou da Imersão Claude?
+Bom dia, pessoal! ☀️
 
-Então você já sabe fazer com IA mais do que a maioria dos nutris do Brasil.
+Uma pergunta pra todo mundo aqui: **depois da Imersão, quem já conseguiu colocar alguma coisa em prática?**
 
-Hoje eu solto o passo a passo pra você montar a **sua própria automação de captura**, criada do zero com o Claude:
+Quem colocou já sabe do que eu tô falando. E quem ainda não colocou: relaxa, hoje é o dia.
 
-o lead comenta no seu post → recebe a recompensa na hora → o WhatsApp dele cai na sua lista.
+Vocês lembram da automação que eu mostrei — aquela que **entrega a recompensa e captura o WhatsApp de quem comenta no post**?
 
-Sai da mensalidade de R$ 249,90 e tenha a sua, com custo zero.
+Hoje eu vou liberar aqui no grupo o **passo a passo completo pra vocês montarem a de vocês.** Do zero. Criando tudo com o Claude.
 
-Responde **QUERO** que eu te mando. 👇
+O lead comenta a palavra-chave no seu post 👉 recebe a recompensa na hora 👉 o WhatsApp dele cai na SUA lista.
 
----
+Cada post vira lista de WhatsApp, em vez de virar só like que não paga boleto.
 
-## 3. Follow-up (24–48h para quem não respondeu)
+E o melhor: o ManyChat cobra **R$ 249,90 por mês** por isso. Todo mês. Pra sempre. E nunca vai ser seu.
 
-Oi, [Nome]!
+O que eu vou mostrar tem **custo de mensalidade ZERO** — porque a ferramenta é de vocês. Quase **R$ 3.000 por ano** que ficam no bolso de vocês.
 
-Só confirmando: você viu que eu liberei o passo a passo da **sua própria automação de captura criada com o Claude**?
+Só o fato de vocês terem estado na Imersão já coloca vocês na frente de muita gente. Agora é hora de sair do "achei incrível" e ir pro "tá rodando".
 
-Pergunto porque conheço a rotina — a mensagem chega no meio do atendimento e some.
-
-Resumo em 3 linhas:
-1. Você já fez a Imersão, já tem a base. Falta só implementar.
-2. O passo a passo monta a automação inteira com o Claude: comentário no post → recompensa entregue → WhatsApp capturado.
-3. Você troca R$ 249,90/mês de mensalidade por uma ferramenta que é sua.
-
-Ainda quer? Responde **QUERO** que eu te mando o acesso hoje.
+**Quem quer, manda um 🚀 aqui no grupo** que eu já mando o acesso.
 
 ---
 
-## 4. Versão "última chamada"
+## 2. Versão mais curta (se o grupo for agitado)
 
-[Nome], última chamada sobre isso.
+Pessoal, quem participou da Imersão Claude presta atenção 👇
 
-Pensa no seu último post que bombou. Quantos comentários? E quantos daqueles números você tem hoje na sua mão?
+Vocês lembram da automação que **entrega a recompensa e captura o WhatsApp de quem comenta no post**?
 
-Provavelmente nenhum. O engajamento aconteceu e foi embora.
+Hoje eu libero o **passo a passo pra vocês montarem a de vocês**, do zero, com o Claude.
 
-É exatamente esse vazamento que a automação fecha: comentou, recebeu a recompensa, entrou na sua lista de WhatsApp.
+Comentou no post 👉 recebeu a recompensa 👉 o WhatsApp caiu na sua lista.
 
-Você já esteve na Imersão. Já viu o Claude construindo na sua frente. Falta o passo a passo — e é ele que eu estou liberando.
+O ManyChat cobra R$ 249,90/mês por isso. O de vocês: mensalidade ZERO, e é de vocês.
 
-Depois de hoje eu fecho. Responde **QUERO** e eu te mando agora.
+**Manda 🚀 aqui no grupo** que eu mando o acesso.
+
+---
+
+## 3. Reforço (algumas horas depois, no mesmo grupo)
+
+Pessoal, só subindo aqui pra quem não viu 👆
+
+Já tem gente do grupo que pediu o passo a passo da automação de captura.
+
+Pensa no seu último post que bombou: quantos comentários teve? E quantos daqueles números você tem hoje na sua mão?
+
+É esse vazamento que a automação fecha.
+
+**Manda 🚀** que eu te mando o acesso ainda hoje.
 
 ---
 
 ## Observações de uso
 
-- Confirmar o valor exato da mensalidade citada (R$ 249,90) antes de disparar, para não gerar contestação.
-- "Custo zero" refere-se à mensalidade da plataforma. Se a implementação usar API do WhatsApp/Instagram, hospedagem ou créditos de IA, vale trocar por "sem mensalidade de plataforma" e explicar o custo real na aula — evita frustração e pedido de reembolso.
-- A automação **captura e entrega**; ela não faz atendimento por mensagem direta. Manter a promessa nesse escopo em toda a comunicação, para o aluno não esperar um robô de conversa.
-- Personalizar o [Nome] no disparo aumenta muito a taxa de resposta.
-- Se houver preço para o passo a passo, inserir a oferta logo depois do bloco dos R$ 3.000/ano — é o ponto de maior tensão da mensagem.
+- Conferir o valor da mensalidade (R$ 249,90) antes de mandar — em grupo, alguém corrige na hora.
+- "Custo zero" = sem mensalidade de plataforma. Se usar API do WhatsApp/Instagram, hospedagem ou créditos de IA, deixar isso claro na aula para não gerar frustração.
+- A automação **captura e entrega**; não faz atendimento por mensagem direta. Manter a promessa nesse escopo.
+- Em grupo, o emoji como resposta (🚀) funciona melhor que "responde QUERO": é rápido, e cada resposta que aparece puxa mais gente (prova social ao vivo).
+- Mandar em bloco único, sem áudio antes — o texto tem que aparecer inteiro na tela.
