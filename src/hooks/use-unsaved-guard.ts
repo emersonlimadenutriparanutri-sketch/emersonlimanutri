@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useBlocker } from "react-router-dom";
+import { useBlocker, type Location } from "react-router-dom";
 
 /**
  * Guarda de navegação para alterações não salvas.
@@ -8,7 +8,7 @@ import { useBlocker } from "react-router-dom";
 export function useUnsavedGuard(temAlteracoes: boolean) {
   const blocker = useBlocker(
     React.useCallback(
-      ({ currentLocation, nextLocation }) =>
+      ({ currentLocation, nextLocation }: { currentLocation: Location; nextLocation: Location }) =>
         temAlteracoes && currentLocation.pathname !== nextLocation.pathname,
       [temAlteracoes],
     ),
