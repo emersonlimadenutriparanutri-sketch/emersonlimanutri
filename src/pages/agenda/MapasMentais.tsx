@@ -175,10 +175,19 @@ function EditorMapa({
 
   const sujo = JSON.stringify(nos) !== JSON.stringify(mapa.nos ?? []);
 
-  const centro = React.useMemo(() => {
+  // O centro precisa acompanhar o tamanho real do canvas: calcular uma vez na
+  // montagem deixaria os nós deslocados no primeiro render e ao redimensionar.
+  const [centro, setCentro] = React.useState({ x: 400, y: 320 });
+
+  React.useEffect(() => {
     const el = canvas.current;
-    return { x: (el?.clientWidth ?? 800) / 2, y: (el?.clientHeight ?? 500) / 2 };
-  }, [nos.length]);
+    if (!el) return;
+    const medir = () => setCentro({ x: el.clientWidth / 2, y: el.clientHeight / 2 });
+    medir();
+    const observador = new ResizeObserver(medir);
+    observador.observe(el);
+    return () => observador.disconnect();
+  }, []);
 
   const aoPressionar = (e: React.PointerEvent, tipo: "pan" | "no", id?: string) => {
     if (tipo === "no") e.stopPropagation();

@@ -84,17 +84,32 @@ export function useSalvar<T extends { id?: string }>(tabela: string, mensagem = 
       return data as T & { id: string };
     },
     onSuccess: (salvo) => {
-      queryClient.setQueriesData<any[]>({ queryKey: [tabela] }, (antigo) => {
-        if (!Array.isArray(antigo)) return antigo;
-        const idx = antigo.findIndex((r) => r?.id === (salvo as any).id);
+      const registro = salvo as Record<string, any>;
+
+      // Percorre as listas em cache uma a uma: a chave é [tabela, userId, filtros]
+      // e cada lista só deve receber o registro se ele satisfizer os filtros dela.
+      for (const query of queryClient.getQueryCache().findAll({ queryKey: [tabela] })) {
+        const atual = query.state.data;
+        if (!Array.isArray(atual)) continue;
+
+        const filtros = query.queryKey[2] as Filtros | undefined;
+        const pertence = satisfazFiltros(registro, filtros);
+        const idx = atual.findIndex((r: any) => r?.id === registro.id);
+
         if (idx >= 0) {
-          const copia = [...antigo];
-          copia[idx] = { ...copia[idx], ...salvo };
-          return copia;
+          if (!pertence) {
+            queryClient.setQueryData(query.queryKey, atual.filter((_: any, i: number) => i !== idx));
+          } else {
+            const copia = [...atual];
+            copia[idx] = { ...copia[idx], ...registro };
+            queryClient.setQueryData(query.queryKey, copia);
+          }
+        } else if (pertence) {
+          queryClient.setQueryData(query.queryKey, [registro, ...atual]);
         }
-        return [salvo, ...antigo];
-      });
-      queryClient.setQueryData([tabela, "item", (salvo as any).id], salvo);
+      }
+
+      queryClient.setQueryData([tabela, "item", registro.id], salvo);
       if (mensagem) toast.success(mensagem);
     },
     onError: (erro: any) => toast.error(traduzir(erro)),
@@ -141,6 +156,20 @@ export function useSalvarLote(tabela: string, mensagem = "Salvo.") {
     },
     onError: (erro: any) => toast.error(traduzir(erro)),
   });
+}
+
+/**
+ * Sem isto, um registro salvo entraria no cache de TODAS as listas da tabela —
+ * inclusive nas de outro paciente ou de outro filtro.
+ */
+function satisfazFiltros(registro: Record<string, any>, filtros?: Filtros) {
+  if (!filtros || typeof filtros !== "object") return true;
+  for (const [campo, valor] of Object.entries(filtros)) {
+    if (valor === undefined || valor === null || valor === "") continue;
+    if (!(campo in registro)) continue;
+    if (registro[campo] !== valor) return false;
+  }
+  return true;
 }
 
 function traduzir(erro: any) {
