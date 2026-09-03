@@ -112,7 +112,16 @@ supabase secrets set CLAUDE_MODELO_RAPIDO=claude-sonnet-5 # resumos curtos
 
 ---
 
-## 7. Publique no seu domínio
+## 7. Conecte o Claude ao seu consultório (opcional)
+
+Em **Configurações → Conector do Claude**, gere um conector e cole o endereço no
+Claude. A partir daí você pode perguntar "quem tem plano vencendo esta semana?"
+direto na conversa. O passo a passo completo está em
+[`CONECTOR-CLAUDE.md`](CONECTOR-CLAUDE.md).
+
+---
+
+## 8. Publique no seu domínio
 
 Qualquer hospedagem de site estático serve. Com a Vercel:
 

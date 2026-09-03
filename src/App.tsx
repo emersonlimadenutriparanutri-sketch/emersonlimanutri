@@ -1,9 +1,10 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { AppLayout } from "@/components/layout/app-layout";
+import { ErrorBoundary } from "@/components/shared/error-boundary";
 import { supabaseConfigurado } from "@/lib/supabase";
 
 import Setup from "@/pages/Setup";
@@ -47,43 +48,42 @@ function RotaPrivada({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-function AppRotas() {
-  return (
-    <Routes>
-      <Route path="/entrar" element={<Entrar />} />
-      <Route path="/aguardando" element={<AguardandoAprovacao />} />
-      <Route path="/q/:token" element={<QuestionarioPublico />} />
-
-      <Route
-        element={
-          <RotaPrivada>
-            <AppLayout />
-          </RotaPrivada>
-        }
-      >
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/consultorio" element={<Consultorio />} />
-        <Route path="/paciente/:id" element={<CentralPaciente />} />
-        <Route path="/agenda" element={<TorreDeControle />} />
-        <Route path="/ia" element={<AreaIA />} />
-        <Route path="/configuracoes" element={<Configuracoes />} />
-        <Route path="/admin" element={<Admin />} />
-      </Route>
-
-      <Route path="*" element={<NaoEncontrado />} />
-    </Routes>
-  );
-}
+/**
+ * Data router (createBrowserRouter), não <BrowserRouter>: é o que habilita
+ * o useBlocker da guarda de alterações não salvas.
+ */
+const rotas = createBrowserRouter([
+  { path: "/entrar", element: <Entrar /> },
+  { path: "/aguardando", element: <AguardandoAprovacao /> },
+  { path: "/q/:token", element: <QuestionarioPublico /> },
+  {
+    element: (
+      <RotaPrivada>
+        <AppLayout />
+      </RotaPrivada>
+    ),
+    children: [
+      { path: "/", element: <Dashboard /> },
+      { path: "/consultorio", element: <Consultorio /> },
+      { path: "/paciente/:id", element: <CentralPaciente /> },
+      { path: "/agenda", element: <TorreDeControle /> },
+      { path: "/ia", element: <AreaIA /> },
+      { path: "/configuracoes", element: <Configuracoes /> },
+      { path: "/admin", element: <Admin /> },
+    ],
+  },
+  { path: "*", element: <NaoEncontrado /> },
+]);
 
 export default function App() {
   if (!supabaseConfigurado) return <Setup />;
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <TooltipProvider delayDuration={300}>
-            <AppRotas />
+            <RouterProvider router={rotas} />
             <Toaster
               position="top-right"
               richColors
@@ -92,7 +92,7 @@ export default function App() {
             />
           </TooltipProvider>
         </AuthProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }

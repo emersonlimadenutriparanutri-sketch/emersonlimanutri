@@ -1,4 +1,4 @@
-import Anthropic from "npm:@anthropic-ai/sdk";
+import Anthropic from "@anthropic-ai/sdk";
 
 /**
  * Camada única de acesso ao Claude.
@@ -53,18 +53,20 @@ export async function pedirTexto({
     max_tokens: maxTokens,
     system,
     output_config: { effort: esforco },
-    messages: [{ role: "user", content: conteudo as never }],
+    messages: [{ role: "user", content: conteudo as Anthropic.MessageParam["content"] }],
   });
 
   if (resposta.stop_reason === "refusal") {
     throw new Error("Não foi possível analisar este conteúdo.");
   }
 
-  return resposta.content
-    .filter((b): b is { type: "text"; text: string } => b.type === "text")
-    .map((b) => b.text)
-    .join("\n")
-    .trim();
+  // content é uma união discriminada: estreitar por `type` é a forma correta
+  // de chegar em `text` sem cast.
+  const partes: string[] = [];
+  for (const bloco of resposta.content) {
+    if (bloco.type === "text") partes.push(bloco.text);
+  }
+  return partes.join("\n").trim();
 }
 
 /**

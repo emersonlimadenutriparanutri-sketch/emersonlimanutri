@@ -25,6 +25,8 @@ domínio** — os dados nunca ficam em uma base compartilhada.
   jornada, Raio-X semanal e evolução.
 - **Torre de Controle** — calendário unificado, quadros kanban e mapas mentais.
 - **Questionário público** — link por token, sem login, mobile-first.
+- **Conector do Claude (MCP)** — cada nutricionista gera o próprio conector e passa a
+  consultar o consultório conversando com o Claude. Ver [`docs/CONECTOR-CLAUDE.md`](docs/CONECTOR-CLAUDE.md).
 
 ## Instalação
 
@@ -45,6 +47,22 @@ supabase link --project-ref SEU_REF
 supabase secrets set ANTHROPIC_API_KEY=sk-ant-...
 supabase functions deploy
 ```
+
+## Testes
+
+Os testes rodam contra um Supabase local de verdade (Postgres, Auth, PostgREST,
+Storage e Edge Functions), não contra mocks:
+
+```bash
+supabase start     # sobe o stack local
+npm run test       # 75 verificações
+```
+
+| Suíte | O que cobre |
+|---|---|
+| `npm run test:rls` | Isolamento entre nutricionistas, escalada de privilégio, acesso anônimo e idempotência do seed |
+| `npm run test:mcp` | Protocolo MCP, autenticação por token, superfície de tabelas e isolamento pelo conector |
+| `npm run test:e2e` | Fluxo real na interface: login → lead → conversão → jornada → questionário público → financeiro → dashboard |
 
 ## Segurança
 

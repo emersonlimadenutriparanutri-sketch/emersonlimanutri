@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { brand } from "@/config/brand";
+import { ConectorClaude } from "@/components/shared/conector-claude";
 
 export default function Configuracoes() {
   const { perfil, user, recarregarPerfil } = useAuth();
@@ -94,6 +95,8 @@ export default function Configuracoes() {
           {semeando ? <Loader2 className="animate-spin" /> : <Sparkles />} Criar conteúdo inicial
         </Button>
       </div>
+
+      <ConectorClaude />
 
       <div className="card-surface max-w-2xl space-y-2 p-5">
         <h2 className="font-display text-base font-semibold">Sobre esta instalação</h2>
