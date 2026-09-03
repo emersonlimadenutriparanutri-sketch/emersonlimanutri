@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------------
+   DESIGN TOKENS — toda cor do app sai daqui.
+   Nunca use cor fixa (bg-[#071739]) dentro de um componente.
+   Para revender com outra marca, troque SOMENTE estes valores.
+   ------------------------------------------------------------------ */
+@layer base {
+  :root {
+    --background: 0 0% 98%;            /* #FAFAFA */
+    --foreground: 221 78% 13%;         /* #071739 */
+
+    --card: 0 0% 100%;
+    --card-foreground: 221 78% 13%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 221 78% 13%;
+
+    --primary: 221 78% 13%;            /* azul-marinho #071739 */
+    --primary-foreground: 40 33% 96%;
+    --primary-soft: 221 40% 94%;
+
+    --secondary: 30 26% 53%;           /* dourado #a68768 */
+    --secondary-foreground: 221 78% 13%;
+    --secondary-soft: 30 38% 93%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+
+    --accent: 30 38% 93%;
+    --accent-foreground: 221 78% 13%;
+
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 52% 34%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 33 90% 45%;
+    --warning-foreground: 0 0% 100%;
+
+    --info: 205 68% 42%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 220 15% 90%;
+    --input: 220 15% 88%;
+    --ring: 30 26% 53%;
+
+    --sidebar: 0 0% 100%;
+    --sidebar-foreground: 221 78% 13%;
+    --sidebar-accent: 30 38% 93%;
+
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  h1, h2, h3, h4 { @apply font-display; }
+  /* Textareas com auto-resize nao devem mostrar barra interna */
+  textarea { @apply resize-none; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { @apply rounded-full bg-border; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-muted-foreground/40; }
+}
+
+@layer components {
+  /* Selo em caixa alta com letter-spacing largo — assinatura visual do app */
+  .seal {
+    @apply inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-seal;
+  }
+  .card-surface {
+    @apply rounded-2xl border border-border/70 bg-card shadow-soft;
+  }
+  .hero-block {
+    @apply rounded-2xl bg-primary text-primary-foreground px-6 py-7 sm:px-8 sm:py-9 shadow-lift;
+  }
+  .stat-value {
+    @apply font-display text-3xl font-semibold leading-none tracking-tight;
+  }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+}
+
+@media print {
+  .no-print { display: none !important; }
+}
