@@ -31,6 +31,8 @@ export default function Calendario() {
   const [visao, setVisao] = React.useState<"mes" | "semana">("mes");
   const [diaAberto, setDiaAberto] = React.useState<string | null>(null);
   const [editando, setEditando] = React.useState<EventoUnificado | null | undefined>(undefined);
+  // Guardado à parte: o painel do dia fecha ao abrir o formulário, mas a data escolhida precisa sobreviver.
+  const [dataDoNovo, setDataDoNovo] = React.useState(hojeISO());
 
   const hoje = hojeISO();
 
@@ -99,7 +101,7 @@ export default function Calendario() {
                 </button>
               ))}
             </div>
-            <Button size="sm" onClick={() => setEditando(null)}><Plus /> Novo evento</Button>
+            <Button size="sm" onClick={() => { setDataDoNovo(hoje); setEditando(null); }}><Plus /> Novo evento</Button>
           </div>
         </div>
 
@@ -203,13 +205,21 @@ export default function Calendario() {
           </div>
 
           <DialogFooter>
-            <Button onClick={() => { setEditando(null); }}><Plus /> Novo evento neste dia</Button>
+            <Button
+              onClick={() => {
+                setDataDoNovo(diaAberto ?? hoje);
+                setDiaAberto(null);
+                setEditando(null);
+              }}
+            >
+              <Plus /> Novo evento neste dia
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <DialogEvento
-        evento={editando} dataPadrao={diaAberto ?? hoje}
+        evento={editando} dataPadrao={dataDoNovo}
         onFechar={() => setEditando(undefined)}
       />
     </div>

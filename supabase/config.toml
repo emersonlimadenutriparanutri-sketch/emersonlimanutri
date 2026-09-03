@@ -1,0 +1,27 @@
+project_id = "consultorio-nutri"
+
+[functions.exames-pdf-ia]
+verify_jwt = true
+
+[functions.analise-rastreamento-ia]
+verify_jwt = true
+
+[functions.resumo-anamnese]
+verify_jwt = true
+
+[functions.resumo-consulta]
+verify_jwt = true
+
+[functions.resumo-questionario]
+verify_jwt = true
+
+[functions.evolucao-paciente]
+verify_jwt = true
+
+[functions.gerar-mapa-mental]
+verify_jwt = true
+
+# Única função pública: é a tela que o paciente abre sem login.
+# A validação é feita pelo token do envio, dentro da própria função.
+[functions.questionario-publico]
+verify_jwt = false
