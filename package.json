@@ -12,7 +12,8 @@
     "test:rls": "node tests/rls.mjs",
     "test:e2e": "node tests/e2e.mjs",
     "test:mcp": "node tests/mcp.mjs",
-    "test": "node tests/rls.mjs && node tests/mcp.mjs && node tests/e2e.mjs"
+    "test": "node tests/rls.mjs && node tests/mcp.mjs && node tests/demo.mjs && node tests/e2e.mjs",
+    "test:demo": "node tests/demo.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",

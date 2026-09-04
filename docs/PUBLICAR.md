@@ -106,22 +106,13 @@ completo: 11 pacientes do perfil 40+, 10 leads no funil, três meses de avaliaç
 exames, rastreamento, Raio-X semanal, jornada, financeiro e agenda.
 
 1. No Supabase, **SQL Editor → New query** → cole todo o
-   `supabase/demo/seed-demo.sql` → **Run**.
-2. Logado no app, volte ao SQL Editor e rode:
+   `supabase/demo/seed-demo.sql` → **Run**. (Isso só instala os comandos; ainda
+   não cria nada.)
+2. No app, entre com a conta de demonstração e abra
+   **Configurações → Consultório de demonstração → Criar demonstração**.
 
-   ```sql
-   select public.seed_demo();
-   ```
-
-   > O SQL Editor roda como administrador do banco, sem usuário logado.
-   > Para funcionar, chame a função **pelo app**: a forma mais simples é abrir
-   > **Configurações**, clicar em **Criar conteúdo inicial** e, em seguida, pedir
-   > ao Claude pelo conector: *"rode a demonstração"*. Ou crie a conta de
-   > demonstração e execute o `select public.seed_demo();` autenticado como ela,
-   > usando o menu **Run as → authenticated** do SQL Editor quando disponível.
-
-3. Para remover depois: `select public.limpar_demo();`
-   Ele apaga **apenas** o que a demonstração criou — nada seu é tocado.
+3. Para desfazer, o botão **Remover dados de demonstração**, na mesma tela.
+   Ele apaga **apenas** o que a demonstração criou — nada que você cadastrou é tocado.
 
 > **Use uma conta separada para demonstrar.** Crie, por exemplo,
 > `demo@seudominio.com.br`. Nunca rode a demonstração na conta que você usa com

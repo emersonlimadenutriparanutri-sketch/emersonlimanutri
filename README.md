@@ -59,13 +59,14 @@ Storage e Edge Functions), não contra mocks:
 
 ```bash
 supabase start     # sobe o stack local
-npm run test       # 75 verificações
+npm run test       # 86 verificações
 ```
 
 | Suíte | O que cobre |
 |---|---|
 | `npm run test:rls` | Isolamento entre nutricionistas, escalada de privilégio, acesso anônimo e idempotência do seed |
 | `npm run test:mcp` | Protocolo MCP, autenticação por token, superfície de tabelas e isolamento pelo conector |
+| `npm run test:demo` | Botão de dados de demonstração: cria, não duplica, e a limpeza preserva o que é seu |
 | `npm run test:e2e` | Fluxo real na interface: login → lead → conversão → jornada → questionário público → financeiro → dashboard |
 
 ## Segurança
