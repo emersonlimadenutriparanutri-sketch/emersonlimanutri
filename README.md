@@ -30,7 +30,11 @@ domínio** — os dados nunca ficam em uma base compartilhada.
 
 ## Instalação
 
-O passo a passo completo está em [`docs/INSTALACAO.md`](docs/INSTALACAO.md).
+- [`docs/PUBLICAR.md`](docs/PUBLICAR.md) — colocar no ar em um endereço, do zero, com roteiro de demonstração.
+- [`docs/INSTALACAO.md`](docs/INSTALACAO.md) — instalação detalhada, passo a passo.
+- [`docs/CONECTOR-CLAUDE.md`](docs/CONECTOR-CLAUDE.md) — conectar o Claude ao consultório.
+- [`docs/REVENDA.md`](docs/REVENDA.md) — entregar a plataforma para outro nutricionista.
+- `supabase/demo/seed-demo.sql` — consultório fictício completo, para demonstrar.
 Resumo para quem já conhece Supabase:
 
 ```bash
